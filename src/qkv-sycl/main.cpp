@@ -124,7 +124,7 @@ void matmul_forward_kernel4(sycl::nd_item<2> id, float* out, const float* inp, c
 
     int si_start = 4*(16 * threadIdx_y + threadIdx_x);
     for (int so = 0; so < C; so += 32) {
-        id.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(id.get_group());
         int xmod8 = threadIdx_x % 8;
         int xby8 = threadIdx_x / 8;
         int xo = 4 * xmod8;
@@ -132,7 +132,7 @@ void matmul_forward_kernel4(sycl::nd_item<2> id, float* out, const float* inp, c
             st_vec(&lhs_s[y][xo], ld_vec(inp + y * C + so + xo));
             st_vec(&rhs_s[y][xo], ld_vec(weight + y * C + so + xo));
         }
-        id.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(id.get_group());
 
         for (int si = si_start; si < si_start + 32; si += 4) {
             sycl::float4 rhs[8];

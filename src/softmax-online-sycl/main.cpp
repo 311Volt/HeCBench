@@ -154,29 +154,29 @@ void softmax_forward_online_kernel3(float* __restrict__ out, const float* __rest
   }
 
   smem[tid] = maxval;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int stride = block_size / 2; stride > 0; stride /= 2) {
       if (tid < stride) {
           smem[tid] = sycl::fmax(smem[tid], smem[tid + stride]);
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
   }
 
   float row_max = smem[0];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   smem[tid] = sumval * sycl::exp(maxval - row_max);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int stride = block_size / 2; stride > 0; stride >>= 1) {
       if (tid < stride) {
           smem[tid] += smem[tid + stride];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
   }
   float row_sum = smem[0];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int i = tid; i < C; i += block_size) {
       y[i] = sycl::exp(x[i] - row_max) / row_sum;

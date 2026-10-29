@@ -116,7 +116,7 @@ void gemv_fp16(
   const int laneId = item.get_local_id(2) % WARP_SIZE;
   const int warpId = item.get_local_id(2) / WARP_SIZE;
   if (laneId == 0) warpLevelSums[item.get_local_id(1)][warpId] = sum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // read from shared memory only if that warp existed
   sum = (item.get_local_id(2) < item.get_local_range(2) / WARP_SIZE)
             ? warpLevelSums[item.get_local_id(1)][laneId]
@@ -199,7 +199,7 @@ void gemv_quantized_int8(
   const int laneId = item.get_local_id(2) % WARP_SIZE;
   const int warpId = item.get_local_id(2) / WARP_SIZE;
   if (laneId == 0) warpLevelSums[item.get_local_id(1)][warpId] = sum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // read from shared memory only if that warp existed
   sum = (item.get_local_id(2) < item.get_local_range(2) / WARP_SIZE)
             ? warpLevelSums[item.get_local_id(1)][laneId]
@@ -311,7 +311,7 @@ void gemv_quantized_int4(
   const int laneId = item.get_local_id(2) % WARP_SIZE;
   const int warpId = item.get_local_id(2) / WARP_SIZE;
   if (laneId == 0) warpLevelSums[item.get_local_id(1)][warpId] = sum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // read from shared memory only if that warp existed
   sum = (item.get_local_id(2) < item.get_local_range(2) / WARP_SIZE)
             ? warpLevelSums[item.get_local_id(1)][laneId]

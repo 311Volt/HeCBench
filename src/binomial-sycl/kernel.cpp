@@ -134,9 +134,9 @@ extern "C" void binomialOptionsGPU(
         for(int i = NUM_STEPS; i > 0; --i)
         {
           call_exchange[tid] = call[0];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           call[ELEMS_PER_THREAD] = call_exchange[tid + 1];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (i > final_it)
           {

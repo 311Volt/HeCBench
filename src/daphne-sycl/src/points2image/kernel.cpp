@@ -375,7 +375,7 @@ void compute_point_from_pointcloud(
     atomicMin(msg_distance[pid], cm_point);
   }
   // synchronize required for deterministic intensity in the image
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (0 <= px && px < w && 0 <= py && py < h)
   {

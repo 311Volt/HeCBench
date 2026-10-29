@@ -61,7 +61,7 @@ void sobelGPU_kernel(sycl::nd_item<2> item,
     v[item.get_local_id(1)] = dir[item.get_local_id(1)];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Set initial index (i.e. which vector this thread is
   // computing first) and stride (i.e. step to the next vector

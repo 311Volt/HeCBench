@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
             s_W[j][i] = u[id + 2 * offset];
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (j < 8) {
             dfloat U1 = 0, V1 = 0, W1 = 0;
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
             s_W1[j][i] = 0;
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           dfloat U2 = 0, V2 = 0, W2 = 0;
           for (int b = 0; b < 8; ++b) {
@@ -168,14 +168,14 @@ int main(int argc, char **argv) {
           }
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for (int k = 0; k < 16; ++k) {
           s_U1[j][i] = r_Ud[k];
           s_V1[j][i] = r_Vd[k];
           s_W1[j][i] = r_Wd[k];
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           dfloat Udr = 0, Uds = 0, Udt = 0;
           dfloat Vdr = 0, Vds = 0, Vdt = 0;
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
           r_V[k] = Uhat * Vdr + Vhat * Vds + What * Vdt;
           r_W[k] = Uhat * Wdr + Vhat * Wds + What * Wdt;
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
 
         for (int c = 0; c < 8; ++c) {
@@ -238,7 +238,7 @@ int main(int argc, char **argv) {
             s_W[j][i] = rhsW;
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (j < 8) {
             dfloat rhsU = 0, rhsV = 0, rhsW = 0;
@@ -255,7 +255,7 @@ int main(int argc, char **argv) {
             s_W1[j][i] = rhsW;
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (i < 8 && j < 8) {
             dfloat rhsU = 0, rhsV = 0, rhsW = 0;

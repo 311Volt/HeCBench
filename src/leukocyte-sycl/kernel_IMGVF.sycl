@@ -24,11 +24,11 @@
 		j = (thread_id + offset) % n;
 		if (i < m) IMGVF_acc[(i * n) + j] = IMGVF_global[(i * n) + j];
 	}
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
 	
 	// Set the converged flag to false
 	if (thread_id == 0) cell_converged_acc[0] = 0;
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
 	
 	// Constants used to iterate through virtual thread blocks
 	const float one_nth = 1.0f / (float) n;
@@ -125,19 +125,19 @@
 			// We need to synchronize between virtual thread blocks to prevent
 			//  threads from writing the values from the buffer to the actual
 			//  IMGVF matrix too early
-			item.barrier(sycl::access::fence_space::local_space);
+			sycl::group_barrier(item.get_group());
 		}
 		
 		// We need to compute the overall sum of the change at each matrix element
 		//  by performing a tree reduction across the whole threadblock
 		IMGVF_buffer_acc[thread_id] = total_diff;
-		item.barrier(sycl::access::fence_space::local_space);
+		sycl::group_barrier(item.get_group());
 		
 		// Account for thread block sizes that are not a power of 2
 		if (thread_id >= NEXT_LOWEST_POWER_OF_TWO) {
                   IMGVF_buffer_acc[thread_id - NEXT_LOWEST_POWER_OF_TWO] += IMGVF_buffer_acc[thread_id];
 		}
-		item.barrier(sycl::access::fence_space::local_space);
+		sycl::group_barrier(item.get_group());
 		
 		// Perform the tree reduction
 		int th;
@@ -145,7 +145,7 @@
 			if (thread_id < th) {
 				IMGVF_buffer_acc[thread_id] += IMGVF_buffer_acc[thread_id + th];
 			}
-			item.barrier(sycl::access::fence_space::local_space);
+			sycl::group_barrier(item.get_group());
 		}
 		
 		// Figure out if we have converged
@@ -159,7 +159,7 @@
 		
 		// We need to synchronize to ensure that all threads
 		//  read the correct value of the convergence flag
-		item.barrier(sycl::access::fence_space::local_space);
+		sycl::group_barrier(item.get_group());
 		
 		// Keep track of the number of iterations we have performed
 		iterations++;

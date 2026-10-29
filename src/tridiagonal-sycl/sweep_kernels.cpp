@@ -343,7 +343,7 @@ void transpose(
   // read the tile from global memory into shared memory
   block[threadIdxy * (BLOCK_DIM+1) + threadIdxx] = idata[idx_a];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // write back to transposed array
   odata[idx_b] = block[threadIdxx * (BLOCK_DIM+1) + threadIdxy];

@@ -364,8 +364,8 @@ GLOBAL static void calc_V_hairpin_and_V_stack
 DEV static void free_energy_min_reduce(sycl::nd_item<3> &wi, int_t* buf, int_t *x, int tid, int nt)
 {
   buf[tid] = *x;
-  for (nt /= 2, wi.barrier(sycl::access::fence_space::local_space); nt > 0; 
-       nt /= 2, wi.barrier(sycl::access::fence_space::local_space))
+  for (nt /= 2, sycl::group_barrier(wi.get_group()); nt > 0; 
+       nt /= 2, sycl::group_barrier(wi.get_group()))
     if (tid < nt)
       free_energy_min(&buf[tid], buf[tid+nt]);
   if (tid == 0)

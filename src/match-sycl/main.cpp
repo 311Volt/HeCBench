@@ -102,20 +102,20 @@ void Match2(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM;d+=M2W)
       for (int j=ty;j<M2W;j+=M2H)
 	buffer1[j*NDIM + d] = d_pts1[(bp1 + j)*NDIM + d];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float max_score = 0.0f;
   int index = -1;
   for (int bp2=0;bp2<NPTS;bp2+=M2H) {
     for (int d=tx;d<NDIM;d+=M2W)
       buffer2[ty*NDIM + d] = d_pts2[(bp2 + ty)*NDIM + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     float score = 0.0f;
     for (int d=0;d<NDIM;d++)
       score += buffer1[tx*NDIM + d]*buffer2[ty*NDIM + d];
     scores[idx] = score;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty==0) {
       for (int i=0;i<M2H;i++) {
@@ -125,7 +125,7 @@ void Match2(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (ty==0) {
@@ -152,20 +152,20 @@ void Match3(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM;d+=M2W)
       for (int j=ty;j<M2W;j+=M2H)
 	buffer1[j*(NDIM + 1) + d] = d_pts1[(bp1 + j)*NDIM + d];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float max_score = 0.0f;
   int index = -1;
   for (int bp2=0;bp2<NPTS;bp2+=M2H) {
     for (int d=tx;d<NDIM;d+=M2W)
       buffer2[ty*NDIM + d] = d_pts2[(bp2 + ty)*NDIM + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     float score = 0.0f;
     for (int d=0;d<NDIM;d++)
       score += buffer1[tx*(NDIM + 1) + d]*buffer2[ty*NDIM + d];
     scores[idx] = score;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty==0) {
       for (int i=0;i<M2H;i++) {
@@ -175,7 +175,7 @@ void Match3(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (ty==0) {
@@ -202,14 +202,14 @@ void Match4(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM/4;d+=M2W)
       for (int j=ty;j<M2W;j+=M2H)
 	buffer1[j*(NDIM/4 + 1) + d] = ((float4*)d_pts1)[(bp1 + j)*(NDIM/4) + d];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float max_score = 0.0f;
   int index = -1;
   for (int bp2=0;bp2<NPTS;bp2+=M2H) {
     for (int d=tx;d<NDIM/4;d+=M2W)
       buffer2[ty*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + ty)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     float score = 0.0f;
     for (int d=0;d<NDIM/4;d++) {
@@ -219,7 +219,7 @@ void Match4(sycl::nd_item<2> &item,
       score += v1.z()*v2.z(); score += v1.w()*v2.w();
     }
     scores[idx] = score;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty==0) {
       for (int i=0;i<M2H;i++) {
@@ -229,7 +229,7 @@ void Match4(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (ty==0) {
@@ -254,14 +254,14 @@ void Match5(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM/4;d+=M5W)
       for (int j=ty;j<M5W;j+=M5H)
 	buffer1[j*(NDIM/4 + 1) + d] = ((float4*)d_pts1)[(bp1 + j)*(NDIM/4) + d];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float max_score = 0.0f;
   int index = -1;
   for (int bp2=0;bp2<NPTS;bp2+=M5H) {
     for (int d=tx;d<NDIM/4;d+=M5W)
       buffer2[ty*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + ty)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty<M5H/M5R) {
       float score[M5R];
@@ -278,7 +278,7 @@ void Match5(sycl::nd_item<2> &item,
       for (int dy=0;dy<M5R;dy++)
 	scores[tx + M5W*(M5R*ty + dy)] = score[dy];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty==0) {
       for (int i=0;i<M5H;i++) {
@@ -288,7 +288,7 @@ void Match5(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (ty==0) {
@@ -319,7 +319,7 @@ void Match6(sycl::nd_item<2> &item,
   for (int bp2=0;bp2<NPTS;bp2+=M5H) {
     for (int d=tx;d<NDIM/4;d+=M5W)
       buffer2[ty*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + ty)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ty<M5H/M5R) {
       float score[M5R];
@@ -340,7 +340,7 @@ void Match6(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   float *scores = (float*)buffer1;
@@ -349,7 +349,7 @@ void Match6(sycl::nd_item<2> &item,
     scores[ty*M5W + tx] = max_score;
     indices[ty*M5W + tx] = index;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty==0) {
     max_score = scores[tx];
@@ -385,7 +385,7 @@ void Match7(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM/4;d+=M7W)
       for (int j=ty;j<M7H;j+=M7H/M7R)
 	buffer2[j*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + j)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     float score[M7R];
     for (int dy=0;dy<M7R;dy++)
@@ -406,14 +406,14 @@ void Match7(sycl::nd_item<2> &item,
 	index = bp2 + M7R*ty + dy;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   float *scores = (float*)buffer1;
   int *indices = (int*)&scores[M7W*M7H/M7R];
   scores[ty*M7W + tx] = max_score;
   indices[ty*M7W + tx] = index;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty==0) {
     max_score = scores[tx];
@@ -457,7 +457,7 @@ void Match8(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM/4;d+=M7W)
       for (int j=ty;j<M7H;j+=M7H/M7R)
 	buffer2[j*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + j)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (idx<M7W*M7H/M7R/NRX) {
       float score[M7R][NRX];
@@ -487,7 +487,7 @@ void Match8(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   float *scores = (float*)buffer1;
@@ -498,7 +498,7 @@ void Match8(sycl::nd_item<2> &item,
       indices[iy*M7W + (M7W/NRX)*i + ix] = index[i];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty==0) {
     float max_score = scores[tx];
@@ -541,7 +541,7 @@ void Match9(sycl::nd_item<2> &item,
     for (int d=tx;d<NDIM/4;d+=M7W)
       for (int j=ty;j<M7H;j+=M7H/M7R/NRX)
 	buffer2[j*NDIM/4 + d] = ((float4*)d_pts2)[(bp2 + j)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     float score[M7R][NRX];
     for (int dy=0;dy<M7R;dy++)
@@ -569,7 +569,7 @@ void Match9(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   float *scores = (float*)buffer1;
@@ -580,7 +580,7 @@ void Match9(sycl::nd_item<2> &item,
       indices[iy*M7W + (M7W/NRX)*i + ix] = index[i];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty==0) {
     float max_score = scores[tx];
@@ -630,7 +630,7 @@ void Match10(sycl::nd_item<2> &item,
     int d = (idx%NUM);
     int j = (idx/NUM);
     buffer2[j*NUM + d] = ((float4*)d_pts2)[(bp2 + j)*(NDIM/4) + d];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int dp=0;dp<NDIM/4;dp+=NUM) {
       float4 temp;
       if (dp<(NDIM/4-NUM))
@@ -656,11 +656,11 @@ void Match10(sycl::nd_item<2> &item,
 	  }
 	}
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (dp<(NDIM/4-NUM)) {
 	buffer2[j*NUM + d] = temp;
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
       }
     }
     for (int dy=0;dy<M7R;dy++) {
@@ -671,7 +671,7 @@ void Match10(sycl::nd_item<2> &item,
 	}
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   float *scores = (float*)buffer1;
@@ -682,7 +682,7 @@ void Match10(sycl::nd_item<2> &item,
       indices[iy*M7W + (M7W/NRX)*i + ix] = index[i];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty==0) {
     float max_score = scores[tx];

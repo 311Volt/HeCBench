@@ -38,7 +38,7 @@ void rng_wallace(unsigned m_seed,
   for (unsigned i = 0; i < 8; i++)
     pool[lid + WALLACE_NUM_THREADS * i] = d_Pool[offset + lid + WALLACE_NUM_THREADS * i];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Loop generating d_randomNumberss repeatedly
   for (unsigned loop = 0; loop < WALLACE_NUM_OUTPUTS_PER_RUN; loop++)
@@ -50,7 +50,7 @@ void rng_wallace(unsigned m_seed,
 
     if (lid == 0)
       pool[WALLACE_CHI2_OFFSET] = d_rngChi2Corrections[mul24(gid, WALLACE_NUM_OUTPUTS_PER_RUN) + loop];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     float chi2CorrAndScale = pool[WALLACE_CHI2_OFFSET];
     for (unsigned i = 0; i < 8; i++)
     {
@@ -79,7 +79,7 @@ void rng_wallace(unsigned m_seed,
       seed = (mul24(seed, lcg_a) + lcg_c) & mod_mask;
       rin3_1 = pool[((seed << 3) + 7)];
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       Hadamard4x4a(rin0_0, rin1_0, rin2_0, rin3_0);
       pool[0 * WALLACE_NUM_THREADS + lid] = rin0_0;
@@ -93,7 +93,7 @@ void rng_wallace(unsigned m_seed,
       pool[6 * WALLACE_NUM_THREADS + lid] = rin2_1;
       pool[7 * WALLACE_NUM_THREADS + lid] = rin3_1;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 

@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
         for (int i = lid; i < cities; i += dim) px[i] = posx_d[i];
         for (int i = lid; i < cities; i += dim) py[i] = posy_d[i];
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if (lid == 0) {  // serial permutation
           unsigned int seed = bid;
@@ -246,12 +246,12 @@ int main(int argc, char *argv[])
           px[cities] = px[0];
           py[cities] = py[0];
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         int minchange;
         do {
           for (int i = lid; i < cities; i += dim) buf[i] = -dist(i, i + 1);
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           minchange = 0;
           int mini = 1;
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
                   bf_s[k] = buf[k + bound];
                 }
               }
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
 
               int lower = bound;
               if (lower < i + 2) lower = i + 2;
@@ -296,18 +296,18 @@ int main(int argc, char *argv[])
                   minj = j;
                 }
               }
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
             }
 
             if (i < cities - 2) {
               minchange += buf[i];
             }
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           int change = buf_s[lid] = minchange;
           if (lid == 0) atomicAdd(climbs_d[0], 1);  // stats only
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           int j = dim;
           do {
@@ -318,19 +318,19 @@ int main(int argc, char *argv[])
               buf_s[lid] = change;
             }
             j = k;
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           } while (j > 1);
 
           if (minchange == buf_s[0]) {
             buf_s[1] = lid;  // non-deterministic winner
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (lid == buf_s[1]) {
             buf_s[2] = mini + 1;
             buf_s[3] = minj;
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           minchange = buf_s[0];
           mini = buf_s[2];
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
               swap(py[i], py[j]);
             }
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         } while (minchange < 0);
 
         int term = 0;
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
           term += dist(i, i + 1);
         }
         buf_s[lid] = term;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         int j = dim;
         do {
@@ -358,12 +358,12 @@ int main(int argc, char *argv[])
           if ((lid + k) < j) {
             term += buf_s[lid + k];
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           if ((lid + k) < j) {
             buf_s[lid] = term;
           }
           j = k;
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         } while (j > 1);
 
         if (lid == 0) {

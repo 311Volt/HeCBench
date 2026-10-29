@@ -36,10 +36,10 @@ void tileSync(const sycl::nd_item<1> &item,
         int gidx = tile * TILE + tid;
 
         s[tid] = in[gidx];
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         out[gidx] = heavy(s[tid], numOps);
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
     }
 }
 
@@ -98,7 +98,7 @@ void tilePipelined(const sycl::nd_item<1> &item,
         out[tile * TILE + tid] = heavy(s[buf * TILE + tid], numOps);
 
         // Make sure every work-item is done reading s[buf] before it is reused.
-        //item.barrier(sycl::access::fence_space::local_space);
+        //sycl::group_barrier(item.get_group());
 
         cur = next;
         buf = nbuf;

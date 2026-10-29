@@ -23,7 +23,7 @@ bucketcount (const float* input ,
   for (int i = lid; i < BUCKET_BLOCK_MEMORY; i += lsize)
     s_offset[i] = 0;
 
-  item_ct1.barrier();
+  sycl::group_barrier(item_ct1.get_group());
 
   for (int tid = gid; tid < listsize; tid += numThreads) {
     float elem = input[tid];
@@ -47,7 +47,7 @@ bucketcount (const float* input ,
         idx;
   }
 
-  item_ct1.barrier();
+  sycl::group_barrier(item_ct1.get_group());
 
   int prefixBase = item_ct1.get_group(2) * BUCKET_BLOCK_MEMORY;
 

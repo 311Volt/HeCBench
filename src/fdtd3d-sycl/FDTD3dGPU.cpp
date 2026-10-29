@@ -151,7 +151,7 @@ bool fdtdGPU(float *output, const float *input, const float *coeff,
 
               d_inputIndex  += stride_z;
               d_outputIndex += stride_z;
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
 
               // Note that for the work items on the boundary of the problem, the
               // supplied index when reading the halo (below) may wrap to the
@@ -174,7 +174,7 @@ bool fdtdGPU(float *output, const float *input, const float *coeff,
                   tile[ty][ltidx + workx + k_radius_default] = ldg(&d_input[d_outputIndex + workx]);
               }
               tile[ty][tx] = current;
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
 
               // Compute the d_output value
               float value = ldg(&d_coef[0]) * current;

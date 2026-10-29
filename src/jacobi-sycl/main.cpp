@@ -81,7 +81,7 @@ void jacobi_step (float*__restrict__ f,
   }
 
   // Synchronize all threads
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float err = 0.0f;
 
@@ -115,7 +115,7 @@ void jacobi_step (float*__restrict__ f,
   }
 
   // Synchronize the block before reading any values from smem
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Using the first warp in the block, reduce over the partial sums
   // in the shared memory array.

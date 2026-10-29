@@ -45,7 +45,7 @@ inline float block_reduce(T val, sycl::nd_item<3> &item, T *shared)
   if(lane == 0)
     shared[wid] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   val = (tid < (item.get_local_range(2) * item.get_local_range(1) *
                 item.get_local_range(0)) /

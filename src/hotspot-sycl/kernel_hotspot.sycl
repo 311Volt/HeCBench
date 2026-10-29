@@ -42,7 +42,7 @@ if(IN_RANGE(loadYidx, 0, row-1) && IN_RANGE(loadXidx, 0, col-1)){
   temp_on_device[ty][tx] = temp_src_acc[index];  // Load the temperature data from global memory to shared memory
   power_on_device[ty][tx] = power_acc[index];// Load the power_acc data from global memory to shared memory
 }
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 // effective range within this block that falls within
 // the valid range of the input data
@@ -76,14 +76,14 @@ for (int i=0; i<iter ; i++){
         (amb_temp - temp_on_device[ty][tx]) * Rz_1);
 
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(i==iter-1)
     break;
   if(computed)   //Assign the computation range
     temp_on_device[ty][tx]= temp_t[ty][tx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 }
 
 // update the global memory

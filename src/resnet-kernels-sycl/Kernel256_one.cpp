@@ -5,7 +5,7 @@ const char weightName256one[] = "data/weight_one_1024.bin";
 const char bnBias_myKernel_Name256one[] = "data/bnBias_myKernel_one_1024.bin";
 const char bnScale_myKernel_Name256one[] = "data/bnScale_myKernel_one_1024.bin";
 
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 void kernel_1024_one_256(
   sycl::nd_item<2> &item,

@@ -170,7 +170,7 @@ int main(int argc, char** argv)
             s_colors[idx].z()= ((c >> 16) & 0xFF) * (1.0f / 255.0f);
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (idx == 0) {
             s_sums[0] = s_colors[0];
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
               s_sums[0] += s_colors[i];
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (idx < 16) {
             // Sort colors along the best fit line.
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
             s_covariance[6 * idx + 5] = diff.z()* diff.z();
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           for (int d = 8; d > 0; d >>= 1) {
             if (idx < d) {
@@ -202,7 +202,7 @@ int main(int argc, char** argv)
               s_covariance[6 * idx + 4] += s_covariance[6 * (idx + d) + 4];
               s_covariance[6 * idx + 5] += s_covariance[6 * (idx + d) + 5];
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
            
           if (idx < 16) {
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
                          s_colors[idx].y() * axis.y() +
                          s_colors[idx].z() * axis.z();
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if (idx < 16) {
             int rank = 0;
@@ -224,20 +224,20 @@ int main(int argc, char** argv)
           
             s_xrefs[idx] = rank;
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           
           // Resolve elements with the same index.
           for (int i = 0; i < 15; i++) {
             if (idx < 16 && idx > i && s_xrefs[idx] == s_xrefs[i]) {
               ++s_xrefs[idx];
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
           
           if (idx < 16) {
             s_colors[s_xrefs[idx]] = s_colors[idx];
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           sycl::uint4 best = evalAllPermutations(item,
                                                  s_colors.get_multi_ptr<sycl::access::decorated::no>().get(),
@@ -251,7 +251,7 @@ int main(int argc, char** argv)
           // Use a parallel reduction to find minimum error.
           const int minIdx = findMinError(item, s_covariance.get_multi_ptr<sycl::access::decorated::no>().get(), s_int.get_multi_ptr<sycl::access::decorated::no>().get());    
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           
           // Only write the result of the winner thread.
           if (idx == minIdx)

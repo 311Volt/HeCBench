@@ -41,7 +41,7 @@ void pair_HMM_forward(
       t[1][1][batch_id][k][l] = transitions[cur_i][batch_id][k][l];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (cur_i > 0 && cur_j == 0) {
     if (cur_i == 1) {
@@ -59,7 +59,7 @@ void pair_HMM_forward(
       f01[0][batch_id][states_id] = 
         forward_matrix_in[cur_i - 1][cur_j][batch_id][states_id];
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       double s = 0.0;
       for (int k = 0; k < 2; k++)
@@ -67,7 +67,7 @@ void pair_HMM_forward(
       s *= (e[batch_id][states_id] * likelihood[0][1][batch_id][states_id]);
       mul_3d[0][batch_id][states_id] = s;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       forward_matrix_out[cur_i][0][batch_id][states_id] = mul_3d[0][batch_id][states_id];
     }
@@ -81,7 +81,7 @@ void pair_HMM_forward(
       f[1][0][batch_id][0][i] = forward_matrix_in[cur_i][cur_j-1][batch_id][i];
       f[1][1][batch_id][0][i] = forward_matrix_in[cur_i][cur_j][batch_id][i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     double s0 = 0.0;
     double s1 = 0.0;
@@ -103,7 +103,7 @@ void pair_HMM_forward(
     mul_4d[2][batch_id][0][states_id] = s2;
     mul_4d[3][batch_id][0][states_id] = s3;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int j = 0; j < 2; j++) {
       double summation = mul_4d[0][batch_id][0][j] + 

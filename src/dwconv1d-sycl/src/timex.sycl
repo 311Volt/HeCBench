@@ -32,7 +32,7 @@ void kernel_forward(const F *__restrict__ const __w,
     for (int j = 0; j < BF; j++) {
         F4(kk, t + Tmax * j) = F4(__k, ti + tj * j);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     sycl::float4 ss[BF];
 #pragma unroll
@@ -85,7 +85,7 @@ void kernel_backward(const F *__restrict__ const __w,
         F4(kk, t + Tmax * j) = F4(__k, ti + tj * j);
         F4(gg, t + Tmax * j) = F4(__gwk, ti + tj * j);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     sycl::float4 ss[BB];
 #pragma unroll

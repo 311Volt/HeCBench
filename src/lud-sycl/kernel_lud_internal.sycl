@@ -12,7 +12,7 @@
   peri_row[ty * BLOCK_SIZE + tx] = d_m[(offset+ty)*(size_t)matrix_dim+global_col_id+tx];
   peri_col[ty * BLOCK_SIZE + tx] = d_m[(global_row_id+ty)*(size_t)matrix_dim+offset+tx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float sum = 0;
   for (i=0; i < BLOCK_SIZE; i++)

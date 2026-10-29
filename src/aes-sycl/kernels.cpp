@@ -101,10 +101,10 @@ void AESEncrypt(      uchar4  *__restrict output  ,
 
         block0[localIndex] = shiftRows(block0[localIndex], localIndex); 
        
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         block1[localIndex]  = mixColumns(block0, galiosCoeff, localIndex); 
         
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         block0[localIndex] = block1[localIndex]^roundKey[r*4 + localIndex];
     }  
     block0[localIndex] = sboxRead(SBox, block0[localIndex]);
@@ -166,10 +166,10 @@ void AESDecrypt(       uchar4  *__restrict output    ,
     
         block0[localIndex] = sboxRead(SBox, block0[localIndex]);
         
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         block1[localIndex] = block0[localIndex]^roundKey[r*4 + localIndex];
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         block0[localIndex]  = mixColumns(block1, galiosCoeff, localIndex); 
     }  
 

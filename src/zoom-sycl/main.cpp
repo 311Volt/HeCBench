@@ -52,7 +52,7 @@ void zoom_in_kernel(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int out_pixel_h = out_start_h + item.get_local_id(1);
   int out_pixel_w = out_start_w + item.get_local_id(2);
@@ -134,7 +134,7 @@ void zoom_out_kernel(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int out_pixel_h = out_start_h + item.get_local_id(1);
   int out_pixel_w = out_start_w + item.get_local_id(2);

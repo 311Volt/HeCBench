@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
         local_sum[local_idi + local_idj*local_sizei] = (obstacles[ii + jj*Nx]) ? 0 : sycl::hypot(u_x,u_y);
         /* increase counter of inspected cells */
         local_sum2[local_idi + local_idj*local_sizei] = (obstacles[ii + jj*Nx]) ? 0 : 1 ;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         int group_id = item.get_group(1);
         int group_id2 = item.get_group(0);
         int group_size = item.get_group_range(1);

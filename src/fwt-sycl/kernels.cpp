@@ -46,7 +46,7 @@ void fwtBatch1Kernel(      float *__restrict d_Output,
         int i2 = i1 + stride;
         int i3 = i2 + stride;
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         float D0 = s_data[i0];
         float D1 = s_data[i1];
         float D2 = s_data[i2];
@@ -70,7 +70,7 @@ void fwtBatch1Kernel(      float *__restrict d_Output,
     //Do single radix-2 stage for odd power of two
     if (log2N & 1)
     {
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for (int pos = lid; pos < N / 2; pos += gsz)
         {
@@ -84,7 +84,7 @@ void fwtBatch1Kernel(      float *__restrict d_Output,
         }
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int pos = lid; pos < N; pos += gsz)
     {

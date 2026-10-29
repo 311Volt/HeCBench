@@ -159,7 +159,7 @@ void findCellBoundsAndReorderK(
       localHash[0] = d_Hash[index - 1];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(index < numParticles){
     //Border case

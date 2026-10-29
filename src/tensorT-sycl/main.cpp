@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
             tile[i] = d_input[i + block_idx * tile_size];
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           for (int i = item.get_local_id(0); i < tile_size; i += item.get_local_range(0)) {
             it = i;
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
             }
             d_output[offset1 + offset2] = tile[local_offset];
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
       });
     });

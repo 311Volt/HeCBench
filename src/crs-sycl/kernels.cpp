@@ -36,7 +36,7 @@ void gcrs_m_1_w_4_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -44,7 +44,7 @@ void gcrs_m_1_w_4_coding_dotprod(
       result = result ^ ( (((matrixInt & (bitInt<< group_inner_offset)) >> group_inner_offset) * fullOneBit) & shared_data[group_offset + j]);
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -89,7 +89,7 @@ void gcrs_m_1_w_5_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -97,7 +97,7 @@ void gcrs_m_1_w_5_coding_dotprod(
       result = result ^ ( (((matrixInt & (bitInt<< group_inner_offset)) >> group_inner_offset) * fullOneBit) & shared_data[group_offset + j]);
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -142,7 +142,7 @@ void gcrs_m_1_w_6_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -150,7 +150,7 @@ void gcrs_m_1_w_6_coding_dotprod(
       result = result ^ ( (((matrixInt & (bitInt<< group_inner_offset)) >> group_inner_offset) * fullOneBit) & shared_data[group_offset + j]);
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -195,7 +195,7 @@ void gcrs_m_1_w_7_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -203,7 +203,7 @@ void gcrs_m_1_w_7_coding_dotprod(
       result = result ^ ( (((matrixInt & (bitInt<< group_inner_offset)) >> group_inner_offset) * fullOneBit) & shared_data[group_offset + j]);
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -248,7 +248,7 @@ void gcrs_m_1_w_8_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -256,7 +256,7 @@ void gcrs_m_1_w_8_coding_dotprod(
       result = result ^ ( (((matrixInt & (bitInt<< group_inner_offset)) >> group_inner_offset) * fullOneBit) & shared_data[group_offset + j]);
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -304,7 +304,7 @@ void gcrs_m_2_w_4_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -314,7 +314,7 @@ void gcrs_m_2_w_4_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -363,7 +363,7 @@ void gcrs_m_2_w_5_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -373,7 +373,7 @@ void gcrs_m_2_w_5_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -422,7 +422,7 @@ void gcrs_m_2_w_6_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -432,7 +432,7 @@ void gcrs_m_2_w_6_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -481,7 +481,7 @@ void gcrs_m_2_w_7_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -491,7 +491,7 @@ void gcrs_m_2_w_7_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -540,7 +540,7 @@ void gcrs_m_2_w_8_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -550,7 +550,7 @@ void gcrs_m_2_w_8_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -601,7 +601,7 @@ void gcrs_m_3_w_4_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -612,7 +612,7 @@ void gcrs_m_3_w_4_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -664,7 +664,7 @@ void gcrs_m_3_w_5_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -675,7 +675,7 @@ void gcrs_m_3_w_5_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -727,7 +727,7 @@ void gcrs_m_3_w_6_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -738,7 +738,7 @@ void gcrs_m_3_w_6_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -790,7 +790,7 @@ void gcrs_m_3_w_7_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -801,7 +801,7 @@ void gcrs_m_3_w_7_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -853,7 +853,7 @@ void gcrs_m_3_w_8_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -864,7 +864,7 @@ void gcrs_m_3_w_8_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -916,7 +916,7 @@ void gcrs_m_4_w_4_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -928,7 +928,7 @@ void gcrs_m_4_w_4_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -981,7 +981,7 @@ void gcrs_m_4_w_5_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -993,7 +993,7 @@ void gcrs_m_4_w_5_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -1046,7 +1046,7 @@ void gcrs_m_4_w_6_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -1058,7 +1058,7 @@ void gcrs_m_4_w_6_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -1111,7 +1111,7 @@ void gcrs_m_4_w_7_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -1123,7 +1123,7 @@ void gcrs_m_4_w_7_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
   }
 
@@ -1176,7 +1176,7 @@ void gcrs_m_4_w_8_coding_dotprod(
 
     shared_data[tid] = *(in + i*size + idx);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
 #pragma unroll
     for ( j = 0; j < w; j++ ) {
@@ -1188,7 +1188,7 @@ void gcrs_m_4_w_8_coding_dotprod(
 
       ++index;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   out[idx] = result[0];

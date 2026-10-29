@@ -359,7 +359,7 @@ int main(int argc, char** argv)
         }
 
         partial[item.get_local_id(0)] = sum;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if (item.get_local_id(0) == 0) {
            sycl::vec<ulong, 8> res;

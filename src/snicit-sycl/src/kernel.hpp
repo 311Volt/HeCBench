@@ -20,7 +20,7 @@ void y_star_gen(
     if (item.get_local_id(2) == 0) {
         shRow[neurons + seed_size + item.get_local_id(1)] = (float)row_idx;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = 0; i < seed_size; i++) {
         if (shRow[neurons+seed_size+i]!=-1.0) {
             if (tid < neurons) {
@@ -29,7 +29,7 @@ void y_star_gen(
             if (tid < seed_size) {
                 shRow[neurons+tid] = 0;
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             if (shRow[neurons + seed_size + item.get_local_id(1)] != -1.f) {
                 for (int j = item.get_local_id(2); j < neurons;
                      j += item.get_local_range(2)) {
@@ -38,18 +38,18 @@ void y_star_gen(
                     }
                 }
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             if (item.get_local_id(1) != i &&
                 shRow[neurons + item.get_local_id(1)] < neurons * 0.03f) {
                 shRow[neurons + seed_size + item.get_local_id(1)] = -1.f;
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
         }
     }
     if (tid < seed_size) {
         y_star_row[tid] = (int)shRow[neurons+seed_size+tid];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 }
 
 void coarse_cluster(
@@ -75,7 +75,7 @@ void coarse_cluster(
     if (tid < y_star_cnt) {
         thisRow[neurons+tid] = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = item.get_local_id(2); i < neurons;
          i += item.get_local_range(2)) {
         if (sycl::fabs(Y0[neurons * y_star_row[item.get_local_id(1)] + i] -
@@ -83,7 +83,7 @@ void coarse_cluster(
             atomicAdd(thisRow[neurons + item.get_local_id(1)], 1.f);
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     int argmin=-10;
     float min_num = neurons+1;
     if (tid == 0) {
@@ -95,7 +95,7 @@ void coarse_cluster(
         }
         centroid_LUT[item.get_group(2)] = argmin;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     argmin = centroid_LUT[item.get_group(2)];
     float v = ((tid < neurons) &&
                (sycl::fabs(thisRow[tid] - Y0[neurons * argmin + tid]) > 0.04f))
@@ -105,7 +105,7 @@ void coarse_cluster(
         Y0[item.get_group(2) * neurons + tid] = v; // change blockIdx.x to argmin
     }
     int count =
-        (item.barrier(sycl::access::fence_space::local_space),
+        (sycl::group_barrier(item.get_group()),
          sycl::reduce_over_group(item.get_group(), v > 0 ? 1 : 0,
                                  sycl::ext::oneapi::plus<>()));
     if (tid == 0) {
@@ -132,7 +132,7 @@ void sparse_hidden_post(
     if (tid < K) {
         shRow[tid] = 0; 
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int i = item.get_local_id(1); i < N;
          i += item.get_local_range(1)) {
@@ -149,7 +149,7 @@ void sparse_hidden_post(
             atomicAdd(shRow[colW], valY * valW);
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (tid < K) {
         Y1[rid * K+tid] = shRow[tid];
     }
@@ -181,7 +181,7 @@ void update_post(
         sycl::min(float(1.0), sycl::max(float(0), wy_centroid + b));
     float val = (sycl::fabs(true_diff) > 0.05f) ? true_diff : 0;
     int count =
-        (item.barrier(sycl::access::fence_space::local_space),
+        (sycl::group_barrier(item.get_group()),
          sycl::reduce_over_group(item.get_group(), val != 0 ? 1 : 0,
                                  sycl::ext::oneapi::plus<>()));
     Y1[rid * neurons+tid] = val;
@@ -204,7 +204,7 @@ void recover(
     int tid = item.get_local_id(2);
     shRow[tid] = Y0[item.get_group(2) * neurons + tid] +
                  Y0[centroid_LUT[item.get_group(2)] * neurons + tid];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     Y0[item.get_group(2) * neurons + tid] = shRow[tid];
 }
 

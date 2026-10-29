@@ -21,7 +21,7 @@ void verify(const T* cpu_out, const T* gpu_out, int64_t n)
 
 #define LOG_MEM_BANKS 5
 #define OFFSET(n) ((n) >> LOG_MEM_BANKS)
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 template<typename T, int N>
 class opt;

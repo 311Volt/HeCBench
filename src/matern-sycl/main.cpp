@@ -43,7 +43,7 @@ void matern_kernel (
     local_weights[ty] = weights[ty];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float squared_diff = 0.f;
 
@@ -57,7 +57,7 @@ void matern_kernel (
     (1.f + sycl::sqrt(5.f) * diff / l + 5.f * squared_diff / (3.f * l * l)) *
     sycl::exp(-sycl::sqrt(5.f) * diff / l) * local_weights[ty];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ty == 0) {
     float res = 0.f;

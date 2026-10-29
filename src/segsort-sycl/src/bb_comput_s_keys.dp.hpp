@@ -1656,7 +1656,7 @@ gen_bk128_tc4_r257_r512_orig(K *key, K *keyB, const Offset *seg_begins,
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+2 ] = rg_k2 ;
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Merge in 2 steps
         int grp_start_wp_id;
         int grp_start_off;
@@ -1733,7 +1733,7 @@ gen_bk128_tc4_r257_r512_orig(K *key, K *keyB, const Offset *seg_begins,
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -1744,7 +1744,7 @@ gen_bk128_tc4_r257_r512_orig(K *key, K *keyB, const Offset *seg_begins,
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 1
         grp_start_wp_id = ((warp_id>>2)<<2);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;
@@ -2029,7 +2029,7 @@ gen_bk256_tc4_r513_r1024_orig(K *key, K *keyB, const Offset *seg_begins,
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+2 ] = rg_k2 ;
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Merge in 3 steps
         int grp_start_wp_id;
         int grp_start_off;
@@ -2106,7 +2106,7 @@ gen_bk256_tc4_r513_r1024_orig(K *key, K *keyB, const Offset *seg_begins,
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -2117,7 +2117,7 @@ gen_bk256_tc4_r513_r1024_orig(K *key, K *keyB, const Offset *seg_begins,
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 1
         grp_start_wp_id = ((warp_id>>2)<<2);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;
@@ -2192,7 +2192,7 @@ gen_bk256_tc4_r513_r1024_orig(K *key, K *keyB, const Offset *seg_begins,
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -2203,7 +2203,7 @@ gen_bk256_tc4_r513_r1024_orig(K *key, K *keyB, const Offset *seg_begins,
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 2
         grp_start_wp_id = ((warp_id>>3)<<3);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;
@@ -2523,7 +2523,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+2 ] = rg_k2 ;
             smem[sml_len+(big_warp_id<<7)+(tid1<<2)+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Merge in 4 steps
         int grp_start_wp_id;
         int grp_start_off;
@@ -2600,7 +2600,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -2611,7 +2611,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 1
         grp_start_wp_id = ((warp_id>>2)<<2);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;
@@ -2686,7 +2686,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -2697,7 +2697,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 2
         grp_start_wp_id = ((warp_id>>3)<<3);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;
@@ -2806,7 +2806,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
             rg_k3 = p ? tmp_k0 : tmp_k1;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
         if(sml_warp){
             smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -2817,7 +2817,7 @@ void gen_bk512_tc4_r1025_r2048_orig(
             smem[grp_start_off+gran+2 ] = rg_k2 ;
             smem[grp_start_off+gran+3 ] = rg_k3 ;
         }
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 3
         grp_start_wp_id = ((warp_id>>4)<<4);
         grp_start_off = (grp_start_wp_id<sml_wp)?grp_start_wp_id*64:sml_len+(grp_start_wp_id-sml_wp)*128;

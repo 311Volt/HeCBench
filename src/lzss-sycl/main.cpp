@@ -50,7 +50,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
   }
 
   // Synchronize all threads to ensure that the buffer is fully loaded
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // find match for every data point
   for (int iteration = 0; iteration < (int)(blockSize / threadSize);
@@ -105,7 +105,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
     // initialize array as 0
     prefixBuffer[item.get_local_id(2) + iteration * threadSize] = 0;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // find encode information
   uint32_t flagCount = 0;
@@ -149,7 +149,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
       flagCount++;
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // prefix summation, up-sweep
   int prefixSumOffset = 1;
@@ -165,7 +165,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
         int bi = prefixSumOffset * (2 * tid + 2) - 1;
         prefixBuffer[bi] += prefixBuffer[ai];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     prefixSumOffset *= 2;
   }
@@ -180,7 +180,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
     prefixBuffer[blockSize] = prefixBuffer[blockSize - 1];
     prefixBuffer[blockSize - 1] = 0;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // prefix summation, down-sweep
   for (int d = 1; d < blockSize; d *= 2)
@@ -200,7 +200,7 @@ void compressKernelI(const T *input, uint32_t numOfBlocks,
         prefixBuffer[ai] = prefixBuffer[bi];
         prefixBuffer[bi] += t;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 

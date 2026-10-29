@@ -47,7 +47,7 @@ void RL(
     }
     offset += item.get_local_range(0);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //broadcast to submatrix
   const unsigned subColPos = csr_diag_ptr_dev[currentCol] + wid + 1;
@@ -76,7 +76,7 @@ void RL(
             s[wid] = val_dev[subColElem];
           }
           //Threads in a warp are always synchronized
-          //item.barrier(access::fence_space::local_space);
+          //sycl::group_barrier(item.get_group());
           if (ridx > currentCol)
           {
             //elem in currentCol same row with subColElem might be 0, so
@@ -94,7 +94,7 @@ void RL(
     woffset += item.get_local_range(0)/32;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   //Clear tmpMem
   offset = 0;
   while (currentLColSize > offset)
@@ -150,7 +150,7 @@ void RL_perturb(
     }
     offset += item.get_local_range(0);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //broadcast to submatrix
   const unsigned subColPos = csr_diag_ptr_dev[currentCol] + wid + 1;
@@ -179,7 +179,7 @@ void RL_perturb(
             s[wid] = val_dev[subColElem];
           }
           //Threads in a warp are always synchronized
-          //item.barrier(access::fence_space::local_space);
+          //sycl::group_barrier(item.get_group());
           if (ridx > currentCol)
           {
             //elem in currentCol same row with subColElem might be 0, so
@@ -197,7 +197,7 @@ void RL_perturb(
     woffset += item.get_local_range(0)/32;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   //Clear tmpMem
   offset = 0;
   while (currentLColSize > offset)
@@ -313,7 +313,7 @@ void RL_onecol_updateSubmat(
       {
         s[0] = val_dev[subColElem];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       if (ridx > currentCol)
       {
         auto val_ref = sycl::atomic_ref<REAL,

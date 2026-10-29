@@ -91,7 +91,7 @@ void decodeKernel(
         shared_scores[j*ALPHABET + jj] = d_scores[j*ALPHABET + jj];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (j=0; j<KEY_LENGTH; ++j) 
     key[j]=j;

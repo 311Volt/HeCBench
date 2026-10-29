@@ -62,7 +62,7 @@ void TaskQueue_gpu(const task_t *__restrict queue,
       t->op = queue[next].op;
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   while(next < gpuQueueSize) {
     // Compute task
     if(t->op == SIGNAL_WORK_KERNEL) {
@@ -79,7 +79,7 @@ void TaskQueue_gpu(const task_t *__restrict queue,
 
       data[(t->id - offset) * tile_size + tid] += t->id;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if(tid == 0) {
       auto ao = sycl::atomic_ref<int,
@@ -93,7 +93,7 @@ void TaskQueue_gpu(const task_t *__restrict queue,
         t->op = queue[next].op;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 

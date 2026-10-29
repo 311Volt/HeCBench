@@ -333,7 +333,7 @@ void phase1_decode_subseq(
       current_subsequence += 4;
       subsequences_processed += 4;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 }
@@ -432,7 +432,7 @@ void phase2_synchronise_blocks(
       ++current_subsequence;
       ++subsequences_processed;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 }

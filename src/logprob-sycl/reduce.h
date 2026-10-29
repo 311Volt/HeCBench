@@ -25,7 +25,7 @@ inline T blockReduceSum(T val, sycl::nd_item<2> &item, T *shared)
   if (lane == 0)
     shared[wid] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Modify from blockDim.x << 5 to blockDim.x / 32. to prevent
   // blockDim.x is not divided by 32
@@ -64,7 +64,7 @@ inline T blockReduceMax(T val, sycl::nd_item<2> &item, T *shared)
   if (lane == 0)  // record in-warp maxx by warp Idx
     shared[wid] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Modify from blockDim.x << 5 to blockDim.x / 32. to prevent
   // blockDim.x is not divided by 32

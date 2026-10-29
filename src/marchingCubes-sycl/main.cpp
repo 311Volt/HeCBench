@@ -105,7 +105,7 @@ void computeMinMaxLv1(float*__restrict minMax, float *__restrict sminMax, sycl::
     sminMax[warpid] = minV;
     sminMax[warpid + warpNum] = maxV;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (warpid == 0)
   {
     minV = sminMax[laneid];
@@ -152,7 +152,7 @@ void compactLv1(
     if (laneid >= c0) testSum += tp;
   }
   if (laneid == 31)sums[warpid] = testSum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (warpid == 0)
   {
     unsigned warpSum = sums[laneid];
@@ -164,12 +164,12 @@ void compactLv1(
     }
     sums[laneid] = warpSum;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (warpid != 0)testSum += sums[warpid - 1];
   if (tid == countingThreadNumLv1 - 1 && testSum != 0) {
     sums[31] = atomicAdd(countedBlockNum, testSum);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (test) blockIndices[testSum + sums[31] - 1] = bIdx;
 }
 
@@ -256,7 +256,7 @@ void compactLv2(
     if (laneid >= c0) testSum += tp;
   }
   if (laneid == 31) sums[warpid] = testSum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (warpid == 0)
   {
     unsigned int warpSum = sums[laneid];
@@ -268,12 +268,12 @@ void compactLv2(
     }
     sums[laneid] = warpSum;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (warpid != 0) testSum += sums[warpid - 1];
   if (tid == countingThreadNumLv2 - 1) {
     sums[31] = atomicAdd(countedBlockNumLv2, testSum);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (test)
   {
@@ -467,7 +467,7 @@ int main(int argc, char* argv[])
             value[voxelZLv2][threadIdx_y][voxelXLv2] = f(x + 1, y, z + 1);
         }
         eds <<= 13;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         unsigned int cubeCase(0);
         if (value[threadIdx_z][threadIdx_y][threadIdx_x] < isoValue) cubeCase |= 1;
         if (value[threadIdx_z][threadIdx_y][threadIdx_x + 1] < isoValue) cubeCase |= 2;
@@ -504,7 +504,7 @@ int main(int argc, char* argv[])
           sumsVertices[warpid] = sumVertices;
           sumsTriangles[warpid] = sumTriangles;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         if (warpid == 0)
         {
           unsigned warpSumVertices = sumsVertices[laneid];
@@ -523,7 +523,7 @@ int main(int argc, char* argv[])
           sumsVertices[laneid] = warpSumVertices;
           sumsTriangles[laneid] = warpSumTriangles;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         if (warpid != 0)
         {
           sumVertices += sumsVertices[warpid - 1];
@@ -534,13 +534,13 @@ int main(int argc, char* argv[])
           sumsVertices[31] = atomicAdd(countedVerticesNumDevice, sumVertices);
           sumsTriangles[31] = atomicAdd(countedTrianglesNumDevice, sumTriangles);
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         unsigned int interOffsetVertices(sumVertices - numVertices);
         sumVertices = interOffsetVertices + sumsVertices[31];//exclusive offset
         sumTriangles = sumTriangles + sumsTriangles[31] - numTriangles;//exclusive offset
         vertexIndices[threadIdx_z][threadIdx_y][threadIdx_x] = interOffsetVertices | distinctEdges;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for (unsigned int c0(0); c0 < numTriangles; ++c0)
         {

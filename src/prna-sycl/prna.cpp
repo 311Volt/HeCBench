@@ -316,8 +316,8 @@ GLOBAL static void calc_hairpin_stack_exterior_multibranch
 DEV static void free_energy_reduce(sycl::nd_item<3> wi, real_t *buf, real_t *x, int tid, int nt)
 {
   buf[tid] = *x;
-  for (nt /= 2, wi.barrier(sycl::access::fence_space::local_space); nt > 0;
-       nt /= 2, wi.barrier(sycl::access::fence_space::local_space))
+  for (nt /= 2, sycl::group_barrier(wi.get_group()); nt > 0;
+       nt /= 2, sycl::group_barrier(wi.get_group()))
     if (tid < nt)
       free_energy_accumulate(&buf[tid], buf[tid+nt]);
   if (tid == 0)

@@ -410,7 +410,7 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
           means[tid] /= (float) num_events;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       
       // Compute average variance for each dimension
       if(tid < num_dimensions) {
@@ -424,7 +424,7 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
           variances[tid] -= means[tid]*means[tid];
       }
       
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       
       if(tid == 0) {
         total_variance = 0.0;
@@ -433,7 +433,7 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         avgvar = total_variance / (float) num_dimensions;
       }
           
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if(original_num_clusters > 1) {
         seed = (num_events-1.0f)/(original_num_clusters-1.0f);
@@ -638,15 +638,15 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         }
         temp_sums[tid] = sum;
  
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // sum = parallelSum(temp_sums,NUM_THREADS_MSTEP);
 
         for(unsigned int bit = NUM_THREADS_MSTEP >> 1; bit > 0; bit >>= 1) {
           float t = temp_sums[tid] + temp_sums[tid^bit];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           temp_sums[tid] = t;
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
         sum = temp_sums[tid];
         if(tid == 0) {
@@ -677,15 +677,15 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         }
         temp_sum[tid] = sum;
         
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // Reduce partial sums
         // sum = parallelSum(temp_sum,NUM_THREADS_MSTEP);
         for(unsigned int bit = NUM_THREADS_MSTEP >> 1; bit > 0; bit >>= 1) {
           float t = temp_sum[tid] + temp_sum[tid^bit];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           temp_sum[tid] = t;
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
         sum = temp_sum[tid];
         if(tid == 0) d_means[c*num_dimensions+d] = sum;
@@ -732,7 +732,7 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         int row,col,c1;
         compute_row_col(item, num_dimensions, &row, &col);
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         
         c1 = item.get_group(1) * NUM_CLUSTERS_PER_BLOCK; // Determines what cluster this block is handling    
 
@@ -751,7 +751,7 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         }
 
         // Sync to wait for all params to be loaded to shared memory
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         float cov_sum1 = 0.0f;
         float cov_sum2 = 0.0f;
@@ -782,19 +782,19 @@ clusters_t* cluster(int original_num_clusters, int desired_num_clusters,
         temp_sums[4*NUM_THREADS_MSTEP+tid] = cov_sum5;
         temp_sums[5*NUM_THREADS_MSTEP+tid] = cov_sum6;
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
    
         for (int c=0; c < NUM_CLUSTERS_PER_BLOCK; c++) {
           //temp_sums[c*NUM_THREADS_MSTEP+tid] = parallelSum(&temp_sums[c*NUM_THREADS_MSTEP],NUM_THREADS_MSTEP);
           float *temp_sum = &temp_sums[c*NUM_THREADS_MSTEP];
           for(unsigned int bit = NUM_THREADS_MSTEP >> 1; bit > 0; bit >>= 1) {
             float t = temp_sum[tid] + temp_sum[tid^bit];
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             temp_sum[tid] = t;
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
           temp_sums[c*NUM_THREADS_MSTEP+tid] = temp_sum[tid];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
         
         if (tid == 0) {

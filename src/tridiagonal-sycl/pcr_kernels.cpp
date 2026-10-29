@@ -51,7 +51,7 @@ void pcr_small_systems_kernel(
 
   float aNew, bNew, cNew, dNew;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // parallel cyclic reduction
   for (int j = 0; j < iterations; j++)
@@ -97,7 +97,7 @@ void pcr_small_systems_kernel(
       cNew = -c[i+delta] * tmp2;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     b[i] = bNew;
     d[i] = dNew;
@@ -105,7 +105,7 @@ void pcr_small_systems_kernel(
     c[i] = cNew;  
 
     delta *= 2;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (thid < delta)
@@ -122,7 +122,7 @@ void pcr_small_systems_kernel(
 #endif
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   x_d[thid + blid * system_size] = x[thid];
 }
@@ -155,7 +155,7 @@ void pcr_branch_free_kernel(
 
   float aNew, bNew, cNew, dNew;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // parallel cyclic reduction
   for (int j = 0; j < iterations; j++)
@@ -181,7 +181,7 @@ void pcr_branch_free_kernel(
     aNew = -a[iLeft] * tmp1;
     cNew = -c[iRight] * tmp2;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     b[i] = bNew;
     d[i] = dNew;
@@ -189,7 +189,7 @@ void pcr_branch_free_kernel(
     c[i] = cNew;  
 
     delta *= 2;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (thid < delta)
@@ -206,7 +206,7 @@ void pcr_branch_free_kernel(
 #endif
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   x_d[thid + blid * system_size] = x[thid];
 }

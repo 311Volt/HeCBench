@@ -68,7 +68,7 @@ void ACFKernelSymm(cartesian g_idata1, unsigned int*__restrict g_odata,
     sdata[item.get_local_id(2)].y() = g_idata1.y[by + item.get_local_id(2)];
     sdata[item.get_local_id(2)].z() = g_idata1.z[by + item.get_local_id(2)];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     by <<= (LOG2_GRID_SIZE - 2);
     by += tx;
@@ -128,7 +128,7 @@ void ACFKernelSymm(cartesian g_idata1, unsigned int*__restrict g_odata,
     sdata[item.get_local_id(2)].y() = g_idata1.y[by + item.get_local_id(2)];
     sdata[item.get_local_id(2)].z() = g_idata1.z[by + item.get_local_id(2)];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     by <<= (LOG2_GRID_SIZE - 2);
     by += tx;
@@ -207,7 +207,7 @@ void ACFKernel(cartesian g_idata1, cartesian g_idata2, unsigned int*__restrict g
   // Each thread will compute the dot product of its assigned vector with every shared vector.
 
   // Ensure all reads are finished before using them for any calculations
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Simplify some notation later on.
   by <<= (LOG2_GRID_SIZE - 2);

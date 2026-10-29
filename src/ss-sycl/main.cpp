@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
           }
 
           if(localIdx == 0) groupSuccessCounter = 0u;
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           auto groupCnt_atomic_ref = sycl::atomic_ref<uint,
                                      sycl::memory_order::relaxed,
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
             }
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           if(localIdx == 0) resultCountBuf[groupIdx] = groupSuccessCounter;
        });
     }).wait();
@@ -355,7 +355,7 @@ int main(int argc, char* argv[])
                 localPattern[idx] = TOLOWER(subStrBuf[idx]);
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             uchar first = localPattern[0];
             uchar second = localPattern[1];
@@ -391,9 +391,9 @@ int main(int argc, char* argv[])
 
                 stringPos += localSize;     // next search idx
 
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 stackSize = stack1Counter;
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
 
                 // continue until stack1 has sufficient good positions for proceed to next Level
                 if((stackSize < localSize) && ((((stringPos)/localSize)*localSize) < searchLength)) continue;
@@ -421,9 +421,9 @@ int main(int argc, char* argv[])
                     }
                 }
 
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 stackSize = stack2Counter;
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
 
                 // continue until stack2 has sufficient good positions proceed to next level
                 if((stackSize < localSize) && ((((stringPos)/localSize)*localSize) < searchLength)) continue;
@@ -449,7 +449,7 @@ int main(int argc, char* argv[])
                     }
                 }
 
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 if((((stringPos/localSize)*localSize) >= searchLength) &&
                    (stack1Counter <= 0) && (stack2Counter <= 0)) break;
             }

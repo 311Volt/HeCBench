@@ -83,7 +83,7 @@ void stddev(sycl::queue &q,
         thread_data += val * val;
       }
       if (tx < ColsPerBlk) sstd[tx] = Type(0);
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       //atomicAdd(sstd + thisColId, thread_data);
       auto atomic_local = sycl::atomic_ref<Type,
@@ -92,7 +92,7 @@ void stddev(sycl::queue &q,
                           sycl::access::address_space::local_space> (sstd[thisColId]);
           atomic_local.fetch_add(thread_data);
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (tx < ColsPerBlk) {
         // atomicAdd(std + colId, sstd[thisColId]);

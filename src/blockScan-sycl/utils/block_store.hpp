@@ -254,7 +254,7 @@ private:
             BlockExchange(temp_storage, item).BlockedToWarpStriped(items);
             if (linear_tid == 0)
                 temp_storage.valid_items = valid_items;     // Move through volatile smem as a workaround to prevent RF spilling on subsequent loads
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             StoreDirectWarpStriped(linear_tid, block_itr, items, temp_storage.valid_items);
         }
@@ -325,7 +325,7 @@ private:
             BlockExchange(temp_storage, item).BlockedToWarpStriped(items);
             if (linear_tid == 0)
                 temp_storage.valid_items = valid_items;     // Move through volatile smem as a workaround to prevent RF spilling on subsequent loads
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             StoreDirectWarpStriped(linear_tid, block_itr, items, temp_storage.valid_items);
         }
     };

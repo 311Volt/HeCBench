@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
         }
 
         // Synchronize (ensure all the threads will be completed before continue)
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // Apply the 1D stencil
         int result = 0;

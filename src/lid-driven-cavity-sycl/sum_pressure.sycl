@@ -11,7 +11,7 @@ Real pres_b = pres_black(col, row);
 sum_cache[lid] = (pres_r * pres_r) + (pres_b * pres_b);
 
 // synchronize threads in block to ensure all thread values stored
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 // add up values for block
 int i = BLOCK_SIZE >> 1;
@@ -19,7 +19,7 @@ while (i != 0) {
   if (lid < i) {
     sum_cache[lid] += sum_cache[lid + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   i >>= 1;
 }
 

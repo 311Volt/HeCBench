@@ -5,7 +5,7 @@ int gX = item.get_local_range(0) * item.get_group(0);
 
 sData[ x ] = d_src_acc [gX + x];
 
-item.barrier(access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 int c;
 

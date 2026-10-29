@@ -272,7 +272,7 @@ int main(int argc, char **argv) {
             else if(l_col == L_SIZE)
               l_data[l_row * (L_SIZE + 2) + L_SIZE + 1] = data[pos + 1];
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             for(int i = 0; i < 3; i++) {
               for(int j = 0; j < 3; j++) {
@@ -336,7 +336,7 @@ int main(int argc, char **argv) {
             else if(l_col == L_SIZE)
               l_data[l_row * (L_SIZE + 2) + (L_SIZE + 1)] = data[pos + 1];
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             float sumx = 0, sumy = 0, angle = 0;
             // find x and y derivatives
@@ -436,7 +436,7 @@ int main(int argc, char **argv) {
             else if(l_col == L_SIZE)
               l_data[l_row * (L_SIZE + 2) + (L_SIZE + 1)] = data[pos + 1];
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             unsigned char my_magnitude = l_data[l_row * (L_SIZE + 2) + l_col];
 

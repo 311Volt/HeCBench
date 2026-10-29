@@ -50,7 +50,7 @@ void benchmark_shmem(float4 *g_data, float4* shm_buffer, sycl::nd_item<1> &item)
   set_vector(shm_buffer, tid+4*blk, init_val(tid+13));
   set_vector(shm_buffer, tid+5*blk, init_val(tid+17));
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   #pragma unroll 32
   for(int j=0; j<TOTAL_ITERATIONS; j++){
@@ -58,12 +58,12 @@ void benchmark_shmem(float4 *g_data, float4* shm_buffer, sycl::nd_item<1> &item)
     shmem_swap(shm_buffer+tid+2*blk, shm_buffer+tid+3*blk);
     shmem_swap(shm_buffer+tid+4*blk, shm_buffer+tid+5*blk);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     shmem_swap(shm_buffer+tid+1*blk, shm_buffer+tid+2*blk);
     shmem_swap(shm_buffer+tid+3*blk, shm_buffer+tid+4*blk);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   g_data[globaltid] = reduce_vector(shm_buffer[tid+0*blk],

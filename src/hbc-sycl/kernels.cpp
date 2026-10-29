@@ -63,7 +63,7 @@ void bitonic_sort(int *values, const int N, sycl::nd_item<1> item)
         }
         idx += item.get_local_range(0);
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       idx = item.get_local_id(0);
     }
   }
@@ -128,13 +128,13 @@ void bc_kernel(
     endpoints_row = (int *)((char *)endpoints + item.get_group(0) * pitch_endpoints);
     *jia = 0;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if ((ind == 0) && (j < DIAMETER_SAMPLES))
   {
     diameters[j] = INT_MAX;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while (ind < end)
   {
@@ -153,7 +153,7 @@ void bc_kernel(
       }
       delta_row[k] = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //Shortest Path Calculation
 
@@ -170,7 +170,7 @@ void bc_kernel(
       current_depth = 0;
       sp_calc_done = false;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //Do first iteration separately since we already know the edges to traverse
     for (int r = item.get_local_id(0) + R[i]; r < R[i + 1]; r += item.get_local_range(0))
@@ -188,7 +188,7 @@ void bc_kernel(
         atomicAdd(sigma_row[w], 1ULL);
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (Q2_len == 0)
     {
@@ -201,7 +201,7 @@ void bc_kernel(
         Q_row[kk] = Q2_row[kk];
         S_row[kk + S_len] = Q2_row[kk];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       if(j == 0)
       {
         endpoints_row[endpoints_len] = endpoints_row[endpoints_len - 1] + Q2_len;
@@ -212,7 +212,7 @@ void bc_kernel(
         current_depth++;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     while (!sp_calc_done)
     {
@@ -243,7 +243,7 @@ void bc_kernel(
         {
           next_index = item.get_local_range(0);
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         int k = item.get_local_id(0); // Initial vertices
         while (k < Q_len)
         {
@@ -265,7 +265,7 @@ void bc_kernel(
           k = atomicAddLocal(next_index, 1);
         }
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (Q2_len == 0) // If there is no additional work found, we're
                               // done
@@ -279,7 +279,7 @@ void bc_kernel(
           Q_row[kk] = Q2_row[kk];
           S_row[kk + S_len] = Q2_row[kk];
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         if(j == 0)
         {
           endpoints_row[endpoints_len] = endpoints_row[endpoints_len - 1] + Q2_len;
@@ -289,7 +289,7 @@ void bc_kernel(
           Q2_len = 0;
           current_depth++;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
     }
 
@@ -303,7 +303,7 @@ void bc_kernel(
         diameters[(ind)] = current_depth + 1;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //Dependency Accumulation (Madduri/Ediger successor method)
     while (current_depth > 0)
@@ -345,12 +345,12 @@ void bc_kernel(
           delta_row[w] = dsw;
         }
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       if(j == 0)
       {
         current_depth--;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     for (int kk = item.get_local_id(0); kk < n; kk += item.get_local_range(0))
@@ -371,7 +371,7 @@ void bc_kernel(
         i = ind;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (ind == 2 * DIAMETER_SAMPLES)
     {
@@ -381,9 +381,9 @@ void bc_kernel(
       {
         diameter_keys[kk] = diameters[kk];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       bitonic_sort(diameter_keys, DIAMETER_SAMPLES, item);
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       if(j == 0)
       {
         int log2n = 0;
@@ -398,7 +398,7 @@ void bc_kernel(
         }
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 

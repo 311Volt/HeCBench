@@ -67,7 +67,7 @@ static Peak findPeak(sycl::queue &q, float *d_image, Peak *d_peak, size_t size)
       maxVal[tid] = val;
       maxPos[tid] = pos;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (tid == 0) {
         val = 0.f, pos = 0;

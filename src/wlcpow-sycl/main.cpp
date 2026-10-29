@@ -42,7 +42,7 @@ void bond_wlcpowallvisc(
     sigc[i]    = sigc_global[i];
     sigt[i]    = sigt_global[i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for( int i = blockIdx_x * blockDim_x + threadIdx_x;
            i < n_local ; i += gridDim_x * blockDim_x ) {

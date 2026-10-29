@@ -47,7 +47,7 @@ float ReduceSum(sycl::nd_item<1> &item,
   if (lane == 0) {
     shared[warp] = val;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // if we we don't have multiple warps, we're done
   if (blockDim_x <= WARP_SIZE) {
@@ -67,7 +67,7 @@ float ReduceSum(sycl::nd_item<1> &item,
         shared[0] = val;
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   return shared[0];
 }
 
@@ -129,7 +129,7 @@ void EstepKernel(
         _gamma[j] = alpha[j] + (end - beg) / num_topics;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // initiate phi sum for validation data for computing vali loss
     for (int j = threadIdx_x; j < num_topics; j += blockDim_x)
@@ -140,7 +140,7 @@ void EstepKernel(
       // initialize new gamma
       for (int k = threadIdx_x; k < num_topics; k += blockDim_x)
         _new_gamma[k] = 0.0f;
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       // compute phi from gamma
       for (int k = beg; k < end; ++k) {
@@ -151,7 +151,7 @@ void EstepKernel(
         if (not _vali or j + 1 == num_iters) {
           for (int l = threadIdx_x; l < num_topics; l += blockDim_x)
             _phi[l] = beta[w * num_topics + l] * sycl::exp(Digamma(_gamma[l]));
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           // normalize phi and add it to new gamma and new beta
           float phi_sum = ReduceSum(item, reduce, _phi, num_topics);
@@ -166,7 +166,7 @@ void EstepKernel(
               _new_gamma[l] += _phi[l] * c;
 
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
 
         if (j + 1 == num_iters) {
@@ -178,14 +178,14 @@ void EstepKernel(
               while (atomicCAS(locks[w], 0, 1)) {}
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             for (int l = threadIdx_x; l < num_topics; l += blockDim_x)
               new_beta[w * num_topics + l] += _phi[l] * c;
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             // release lock
             if (threadIdx_x == 0) locks[w] = 0;
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
 
           // comput loss and reset shared mem
@@ -195,7 +195,7 @@ void EstepKernel(
             _loss_vec[l] -= sycl::log(sycl::fmax(_phi[l], EPS));
             _loss_vec[l] *= _phi[l];
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           float _loss = ReduceSum(item, reduce, _loss_vec, num_topics) * c;
           if (threadIdx_x == 0) {
             if (_vali)
@@ -203,16 +203,16 @@ void EstepKernel(
             else
               train_losses[blockIdx_x] += _loss;
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
 
       // update gamma
       for (int k = threadIdx_x; k < num_topics; k += blockDim_x)
         _gamma[k] = _new_gamma[k] + alpha[k];
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     // update gradient of alpha and loss from E[log(theta)]
@@ -232,6 +232,6 @@ void EstepKernel(
       vali_losses[blockIdx_x] += vali_loss;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }

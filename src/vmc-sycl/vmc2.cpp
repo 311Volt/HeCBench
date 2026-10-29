@@ -55,7 +55,7 @@ void SumWithinBlocks(const int n, FLOAT *data,
     i += nthread;
   }
   sdata[tid] = st;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Now do binary tree sum within a block
 
@@ -64,7 +64,7 @@ void SumWithinBlocks(const int n, FLOAT *data,
       //printf("%4d : %4d %4d\n", tid, s, tid+s);
       sdata[tid] += sdata[tid + s];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   if (tid==0) blocksums[gid] = sdata[0];
 }

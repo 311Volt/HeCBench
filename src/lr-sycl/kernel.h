@@ -14,7 +14,7 @@ void linear_regression(
   interns[loc_id].z() = (dataset[glob_id].x() * dataset[glob_id].y());
   interns[loc_id].w() = (dataset[glob_id].x() * dataset[glob_id].x());
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (size_t i = (loc_size / 2), old_i = loc_size; i > 0; old_i = i, i /= 2)
   {
@@ -26,7 +26,7 @@ void linear_regression(
         interns[loc_id] += interns[old_i - 1];
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (loc_id == 0) result[item.get_group(0)] = interns[0];
@@ -49,7 +49,7 @@ void rsquared(
   float y_estimated = dataset[glob_id].x() * equation.y() + equation.x();
   dist[loc_id].y() = sycl::pow((y_estimated - mean), 2.f);
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (size_t i = (loc_size / 2), old_i = loc_size; i > 0; old_i = i, i /= 2)
   {
@@ -61,7 +61,7 @@ void rsquared(
         dist[loc_id] += dist[old_i - 1];
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (loc_id == 0) result[item.get_group(0)] = dist[0];

@@ -43,7 +43,7 @@ void VecQuant3MatMulKernel(
 
   unsigned int tmp1, tmp2, tmp;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while (k < BLOCKWIDTH) { //while (k < min(height, BLOCKWIDTH)) {
     tmp1 = as_unsigned(mat[i]);
@@ -137,7 +137,7 @@ void VecQuant3MatMulKernelFaster(const sycl::half2 *__restrict__ vec,
 
   unsigned int tmp1, tmp2, tmp;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while (k < blockwidth2) {
     res2 = {};

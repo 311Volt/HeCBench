@@ -21,7 +21,7 @@ void bucketsort(const float *input, const int *indice, float *output,
 		s_offset[i] = offsets[i & (DIVISIONS - 1)] + prefixoffsets[prefixBase + i];
 	}
 
-  item_ct1.barrier();
+  sycl::group_barrier(item_ct1.get_group());
 
         for (int tid = gid; tid < listsize; tid += numThreads){
     float elem = input[tid];

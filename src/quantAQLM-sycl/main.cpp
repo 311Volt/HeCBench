@@ -62,11 +62,11 @@ void Code1x16MatVec(
 
   int iters = (prob_k / 8 + 8 * warpSize - 1) / (8 * warpSize);
   while (iters--) {
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = item.get_local_id(2); i < warpSize * 8; i += item.get_local_range(2)) {
       if (b_gl_rd + i < prob_k / 8) sh_b[F * (i / 8) + i % 8] = B[b_gl_rd + i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     b_gl_rd += warpSize * 8;
 
     int b_sh_rd = F * sg.get_local_linear_id();

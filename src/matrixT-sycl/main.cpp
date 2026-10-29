@@ -30,7 +30,7 @@ int MUL_FACTOR    = TILE_DIM;
 int MAX_TILES = (FLOOR(MATRIX_SIZE_X,512) * FLOOR(MATRIX_SIZE_Y,512)) / (TILE_DIM *TILE_DIM);
 
 #define __syncthreads() \
-  item.barrier(sycl::access::fence_space::local_space)
+  sycl::group_barrier(item.get_group())
 
 // -------------------------------------------------------
 // Copies

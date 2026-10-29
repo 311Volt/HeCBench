@@ -48,7 +48,7 @@ void chemv_kernel0(struct ComplexFloat *AT, struct ComplexFloat *X, struct Compl
           Y[32 * b0 + t0].Re = private_var99_Re;
           Y[32 * b0 + t0].Im = private_var99_Im;
         }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 }
 
@@ -75,6 +75,6 @@ void chemv_kernel1(struct ComplexFloat *AT, struct ComplexFloat *X, struct Compl
         Y[32 * b0 + t0].Re = private_var96_Re;
         Y[32 * b0 + t0].Im = private_var96_Im;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 }

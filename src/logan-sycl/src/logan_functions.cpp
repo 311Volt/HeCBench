@@ -28,13 +28,13 @@ inline short reduce_max(short *input, int dim, int n_threads, sycl::nd_item<1> &
       if(myTId < i){
         input[myTId] = (input[myTId] > input[myTId + i]) ? input[myTId] : input[myTId + i];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
   if(myTId<32)
     warpReduce(input, myTId);
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   return input[0];
 }
 
@@ -271,7 +271,7 @@ void extendSeedLGappedXDropOneDirectionGlobal(
                     best, scoreDropOff, cols, rows, minCol, maxCol, antiDiagNo,
                     offset1, offset2, direction, n_threads, item);
     //roofline analysis
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int tmp, antiDiagBest = UNDEF;
     for(int i=0; i<a3size; i+=n_threads){
@@ -281,7 +281,7 @@ void extendSeedLGappedXDropOneDirectionGlobal(
         temp[myTId] = (myTId<size) ? antiDiag3[myTId+i]:UNDEF;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       tmp = reduce_max(temp, size, n_threads, item);
       antiDiagBest = (tmp>antiDiagBest) ? tmp:antiDiagBest;

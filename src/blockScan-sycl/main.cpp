@@ -89,14 +89,14 @@ void BlockPrefixSumKernel(const int *d_in,  // Tile of input
   BlockLoadT(slm.load, item).Load(d_in, data);
 
   // Barrier for smem reuse
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Compute exclusive prefix sum
   int aggregate;
   BlockScanT(slm.scan, item).ExclusiveSum(data, data, aggregate);
 
   // Barrier for smem reuse
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Store items from a blocked arrangement
   BlockStoreT(slm.store, item).Store(d_out, data);

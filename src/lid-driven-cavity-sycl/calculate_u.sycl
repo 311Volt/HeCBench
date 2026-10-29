@@ -49,7 +49,7 @@ if (col != NUM) {
 max_cache[lid] = new_u;
 
 // synchronize threads in block to ensure all velocities stored
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 // calculate maximum for block
 int i = BLOCK_SIZE >> 1;
@@ -57,7 +57,7 @@ while (i != 0) {
   if (lid < i) {
     max_cache[lid] = sycl::fmax(max_cache[lid], max_cache[lid + i]);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   i >>= 1;
 }
 

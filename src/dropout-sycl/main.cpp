@@ -66,7 +66,7 @@ void fused_dropout_kernel(const scalar_t *__restrict__ a,
         c[bOffset] = (mask_t)(&rand.x())[ii];
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 
@@ -137,7 +137,7 @@ void fused_dropout_kernel_vec(const scalar_t *__restrict__ a,
     *(reinterpret_cast<LoadT*>(&b[linearIndex])) = *reinterpret_cast<LoadT*>(&r[0]);
     *(reinterpret_cast<MaskLoadT*>(&c[linearIndex])) = *reinterpret_cast<MaskLoadT*>(&mask[0]);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 

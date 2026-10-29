@@ -83,7 +83,7 @@ threadblock_sync_state(state_t<vec_size> &st, DTypeIn *v_smem, float *s_smem,
   st.o.cast_store(v_smem + ty * head_dim + tx * vec_size);
   s_smem[ty] = st.get_lse();
   st.init();
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 #pragma unroll
   for (uint32_t iter = 0; iter < bdy; ++iter) {
@@ -101,7 +101,7 @@ inline void threadblock_sum(vec_t<float, vec_size> &v, DTypeIn *v_smem,
   constexpr uint32_t head_dim = vec_size * bdx;
   v.cast_store(v_smem + ty * head_dim + tx * vec_size);
   v.fill(DTypeIn(0.f));
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 #pragma unroll
   for (uint32_t iter = 0; iter < bdy; ++iter) {
@@ -249,17 +249,17 @@ void MergeStatesLargeNumIndexSetsKernel(
           iter * bdy + (ty * bdx + tx) < num_index_sets
               ? S[(pos * num_index_sets + (iter * bdy + ty * bdx + tx)) * num_heads + head_idx]
               : 0.f;
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     cp_async::wait_group<num_smem_stages - 1>();
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     vec_t<float, vec_size> v;
     v.cast_load(v_smem + ((iter % num_smem_stages) * bdy + ty) * head_dim + tx * vec_size);
     if (iter * bdy + ty < num_index_sets) {
       float s = s_smem[(iter % bdx) * bdy + ty];
       st.merge(v, s, 1);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     cp_async::pred_load<vec_bits, PrefetchMode::kPrefetch, SharedMemFillMode::kNoFill>(
         v_smem + ((iter % num_smem_stages) * bdy + ty) * head_dim + tx * vec_size,
         V +
@@ -271,7 +271,7 @@ void MergeStatesLargeNumIndexSetsKernel(
     cp_async::commit_group();
   }
   cp_async::wait_group<0>();
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   st.normalize();
   threadblock_sync_state<bdx, bdy, vec_size>(st, v_smem, s_smem, item);

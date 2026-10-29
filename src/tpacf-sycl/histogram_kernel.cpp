@@ -164,7 +164,7 @@ void histoKernel(unsigned int*__restrict g_odata, const unsigned int*__restrict 
   for (int pos = item.get_local_id(2); pos < (MEMPERBLOCK >> 2); pos += item.get_local_range(2))
     ((unsigned int *)s_Hist)[pos] = 0;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Location in g_idata in which this block starts reading
   const int gStart = sycl::mul24((int)item.get_group(2), DATAPERBLOCK);
@@ -182,7 +182,7 @@ void histoKernel(unsigned int*__restrict g_odata, const unsigned int*__restrict 
     s_Hist[threadPos + sycl::mul24((int)((dataTemp >> 26) & 63), NUMTHREADS)]++;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Use NUMBINS threads to create a per-block sub-histogram from the data in shared memory
   if (item.get_local_id(2) < NUMBINS) {

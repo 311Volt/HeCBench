@@ -61,7 +61,7 @@ void bincount (
     for (IndexType i = lid; i < nbins; i += wgs) {
       smem[i] = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (IndexType linearIndex = gid * wgs + lid;
                    linearIndex < input_size; linearIndex += wgr * wgs) {
@@ -73,7 +73,7 @@ void bincount (
         gpuAtomicAddNoReturn<sycl::memory_scope::work_group>(smem[bin], 1);
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Atomically update output bin count.
     for (IndexType i = lid; i < nbins; i += wgs) {

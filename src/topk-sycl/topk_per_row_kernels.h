@@ -367,11 +367,11 @@ void scan(sycl::nd_item<3> &item, IdxT volatile* histogram)
         IdxT thread_data[items_per_thread];
 
         BlockLoadT(slm.load, item).Load(histogram, thread_data);
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         BlockScanT(slm.scan, item).InclusiveSum(thread_data, thread_data);
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         BlockStoreT(slm.store, item).Store(histogram, thread_data);
     }
@@ -388,7 +388,7 @@ void scan(sycl::nd_item<3> &item, IdxT volatile* histogram)
         auto &slm = *sycl::ext::oneapi::group_local_memory_for_overwrite<scan>(g);
         BlockScan(slm, item).InclusiveSum(thread_data, thread_data);
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if (item.get_local_id(2) < num_buckets)
         {
@@ -643,7 +643,7 @@ bool filter_and_histogram_for_one_block(sycl::nd_item<3> &item,
     {
         *p_filter_cnt = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int const start_bit = calc_start_bit<T, BitsPerPass>(pass);
     unsigned const mask = calc_mask<T, BitsPerPass>(pass);
@@ -698,7 +698,7 @@ bool filter_and_histogram_for_one_block(sycl::nd_item<3> &item,
             uint32_t diff        = global_min_bits ^ global_max_bits;
             use_one_pass_sm      = diff < (1u << BitsPerPass);
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         return use_one_pass_sm;
     }
@@ -845,7 +845,7 @@ void radix_topk_one_block_kernel(sycl::nd_item<3> &item,
         counter.out_cnt        = 0;
         counter.out_back_cnt   = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     in += batch_id * len;
     out += batch_id * k;
@@ -904,10 +904,10 @@ void radix_topk_one_block_kernel(sycl::nd_item<3> &item,
                 in_buf, in_idx_buf, out_buf, out_idx_buf, out, out_idx,
                 previous_len, &counter, histogram, select_min, pass, k,
                 use_one_pass_sm); //@TODO CHECK UPDATE CODE
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         scan<IdxT, BitsPerPass, BlockSize>(item, histogram + use_one_pass * num_buckets);
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         choose_bucket<T, IdxT, BitsPerPass>(item,
                                             &counter,
@@ -918,7 +918,7 @@ void radix_topk_one_block_kernel(sycl::nd_item<3> &item,
         {
             counter.previous_len = current_len;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if(use_one_pass || pass == num_passes - 1)
         {

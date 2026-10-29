@@ -65,12 +65,12 @@ void twoWayScan(unsigned char* __restrict sMem,
     bool isFwd = tid >= offset; 
     bool isRev = tid <= lb;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (isFwd) fwd_val = elementOp<opType>(opArray[tid + ub], opArray[tid + lb]);
     if (isRev) rev_val = elementOp<opType>(opArray[tid], opArray[tid + offset]);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (isFwd) opArray[tid + ub] = fwd_val;
     if (isRev) opArray[tid] = rev_val;
@@ -98,7 +98,7 @@ void vhgw_horiz(unsigned char* __restrict dst,
   if (tidx + selSize < width) {
     sMem[lidx + selSize] = src[tidy * width + tidx + selSize];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   twoWayScan<opType>(sMem, opArray, selSize, lidx, item);
 
@@ -129,7 +129,7 @@ void vhgw_vert(unsigned char* __restrict dst,
   if (tidy + selSize < height) {
     sMem[lidy + selSize] = src[(tidy + selSize) * width + tidx];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   twoWayScan<opType>(sMem, opArray, selSize, lidy, item);
 

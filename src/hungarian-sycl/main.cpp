@@ -18,7 +18,7 @@
 #define kmin(x,y) ((x<y)?x:y)
 #define kmax(x,y) ((x>y)?x:y)
 
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 inline int atomicExch(int& var, const int val) {
   auto atm = sycl::atomic_ref<int,

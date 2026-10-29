@@ -166,10 +166,10 @@ void fpc_kernel (sycl::nd_item<1> &item, unsigned &compressable,
   }
 
   if (lid == 0) compressable = 0;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   atomicAdd<sycl::memory_scope::work_group>(compressable, inc);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (lid == WGS-1) {
     atomicAdd(cmp_size[0], compressable);
   }
@@ -216,10 +216,10 @@ void fpc2_kernel (sycl::nd_item<1> &item, unsigned &compressable,
     inc = inc7;
 
   if (lid == 0) compressable = 0;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   atomicAdd<sycl::memory_scope::work_group>(compressable, inc);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (lid == WGS-1) {
     atomicAdd(cmp_size[0], compressable);
   }

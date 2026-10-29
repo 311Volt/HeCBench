@@ -58,7 +58,7 @@ void Transpose(sycl::nd_item<2> &item,
     }
 
     // Synchronize the read into LMEM
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // write the transposed matrix tile to global memory
     xIndex = item.get_group(0) * item.get_local_range(0) + item.get_local_id(1);

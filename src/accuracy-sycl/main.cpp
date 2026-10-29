@@ -37,7 +37,7 @@ void accuracy_kernel(
     if (ngt <= top_k) {
       ++count;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   if (item.get_local_id(0) == 0) {
     auto ao = sycl::atomic_ref<int,
@@ -66,7 +66,7 @@ void accuracy_kernel2(
       s_label = labelData[row];
       s_label_pred = Xdata[row * D + s_label];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     const int   label      = s_label;
     const float label_pred = s_label_pred;
@@ -94,7 +94,7 @@ void accuracy_kernel2(
     if (item.get_local_id(0) == 0 && ngt <= top_k) {
       ++count;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (item.get_local_id(0) == 0 && count > 0) {

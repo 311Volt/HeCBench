@@ -150,7 +150,7 @@ inline void exchange_smem_pre(float x_vals[kNChunks][kNElts], vec_t *smem, sycl:
     // We use the XOR swizzle trick (new_col = col ^ row) to avoid / reduce smem bank conflicts.
     #pragma unroll
     for (int c0 = 0; c0 < kNChunks / kChunksPerExchange; ++c0) {
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 #pragma unroll
         for (int c1 = 0; c1 < kChunksPerExchange; ++c1) {
             #pragma unroll
@@ -158,7 +158,7 @@ inline void exchange_smem_pre(float x_vals[kNChunks][kNElts], vec_t *smem, sycl:
                 smem[(c1 * kNExchangePerVec + r) * kNThreads + (Pre ? warp_id * kWarpSize + lane_id ^ warp_id : row_t * kWarpSize + col_t ^ row_t)] = reinterpret_cast<vec_t*>(x_vals[c0 * kChunksPerExchange + c1])[r];
             }
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 #pragma unroll
         for (int c1 = 0; c1 < kChunksPerExchange; ++c1) {
             #pragma unroll

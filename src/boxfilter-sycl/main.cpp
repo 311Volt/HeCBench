@@ -100,7 +100,7 @@ void BoxFilterGPU ( sycl::queue &q,
           else
               uc4LocalData[lid] = {0, 0, 0, 0};
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if((globalPosX >= 0) && (globalPosX < uiWidth) && (lid >= iRadiusAligned) &&
              (lid < (iRadiusAligned + (int)uiNumOutputPix)))

@@ -92,7 +92,7 @@ void bb_bin_histo(
 
     if (tid < SEGBIN_NUM + 1)
         local_histo[tid] = 0;
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
 
     if (gid < num_segs)
     {
@@ -127,7 +127,7 @@ void bb_bin_histo(
             atomicMax(local_histo[13], size);
         }
     }
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
 
     if(tid < 32) {
         warp_exclusive_sum(local_histo, local_histo, SEGBIN_NUM, item_ct1);

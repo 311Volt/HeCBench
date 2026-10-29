@@ -503,16 +503,16 @@ void transform(
       loadAndVerticallyTransform(fdwt53, &boundaryColumn, CHECK_LOADS, in, &pIO_b); 
     }
 
-    item.barrier(access::fence_space::local_space); 
+    sycl::group_barrier(item.get_group()); 
 
     int flag = 0; //flag = 0 execute Forward53Predict, flag = 1 execute Forward53Update
 
     forEachHorizontalOdd(item, &fdwt53[0].buffer, 2, fdwt53[0].WIN_SIZE_Y, flag);		
-    item.barrier(access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     flag = 1;
     forEachHorizontalEven(item, &fdwt53[0].buffer, 2, fdwt53[0].WIN_SIZE_Y, flag);		
-    item.barrier(access::fence_space::local_space);	
+    sycl::group_barrier(item.get_group());	
 
 
     for(int r = 2; r < (2+fdwt53[0].WIN_SIZE_Y); r+= 2)
@@ -531,6 +531,6 @@ void transform(
         writer.next += bandIO.strideHighToLow;
       }
     }
-    item.barrier(access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }

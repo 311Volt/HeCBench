@@ -16,7 +16,7 @@ if(ei<no){                              // do only for the number of elements, o
 }
 
 // Lingjie Zhang modificated at Nov 1, 2015
-item.barrier();
+sycl::group_barrier(item.get_group());
 
 // reduction of sums if all blocks are full (rare case)  
 if(nf == NUMBER_THREADS){
@@ -28,7 +28,7 @@ if(nf == NUMBER_THREADS){
       d_psum2[tx] = d_psum2[tx] + d_psum2[tx-i/2];
     }
     // synchronization
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   // final sumation by last thread in every block
   if(tx==(NUMBER_THREADS-1)){                      // block result stored in global memory
@@ -48,7 +48,7 @@ else{
         d_psum2[tx] = d_psum2[tx] + d_psum2[tx-i/2];
       }
       // synchronization
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     // final sumation by last thread in every block
     if(tx==(NUMBER_THREADS-1)){                    // block result stored in global memory
@@ -72,7 +72,7 @@ else{
         d_psum2[tx] = d_psum2[tx] + d_psum2[tx-i/2];
       }
       // synchronization (all threads)
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     // remainder / final summation by last thread
     if(tx==(df-1)){                    //

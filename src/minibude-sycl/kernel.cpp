@@ -80,7 +80,7 @@ void fasten_main(
     etot[i] = ZERO;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Loop over ligand atoms
   size_t il = 0;

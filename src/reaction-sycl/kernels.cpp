@@ -44,7 +44,7 @@ void derivative_x2_pbc(
 
   s_f[sj * (mx + 2 * offset) + si] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // fill in periodic images in shared memory array
   if (i < offset) {
@@ -52,7 +52,7 @@ void derivative_x2_pbc(
     s_f[sj * (mx + 2 * offset) + si + mx] = s_f[sj * (mx + 2 * offset) + si];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   df[globalIdx] = s_f[sj * (mx + 2 * offset) + si + 1] - 2.f * s_f[sj * (mx + 2 * offset) + si] + s_f[sj * (mx + 2 * offset) + si - 1];
 }
@@ -77,7 +77,7 @@ void derivative_x2_zeroflux(
 
   s_f[sj * mx + i] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(i == 0) {
     df[globalIdx] = s_f[sj * mx + i + 1] - s_f[sj * mx + i];
@@ -111,7 +111,7 @@ void derivative_y2_pbc(
 
   s_f[sj * pencils + si] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // fill in periodic images in shared memory array
   if (j < offset) {
@@ -119,7 +119,7 @@ void derivative_y2_pbc(
     s_f[(sj + my) * pencils + si] = s_f[sj * pencils + si];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   df[globalIdx] = s_f[(sj+1) * pencils + si] - 2.f * s_f[sj * pencils + si] + s_f[(sj-1) * pencils + si];
 }
@@ -144,7 +144,7 @@ void derivative_y2_zeroflux(
 
   s_f[j * pencils + si] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(j == 0) {
     df[globalIdx] = s_f[(j+1) * pencils + si] - s_f[j * pencils + si];
@@ -178,7 +178,7 @@ void derivative_z2_pbc(
 
   s_f[sk * pencils + si] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // fill in periodic images in shared memory array
   if (k < offset) {
@@ -186,7 +186,7 @@ void derivative_z2_pbc(
     s_f[(sk + mz) * pencils + si] = s_f[sk * pencils + si];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   df[globalIdx] = s_f[(sk+1) * pencils + si] - 2.f * s_f[sk * pencils + si] + s_f[(sk-1) * pencils + si];
 }
@@ -212,7 +212,7 @@ void derivative_z2_zeroflux(
 
   s_f[k * pencils + si] = f[globalIdx];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(k == 0) {
     df[globalIdx] = s_f[(k+1) * pencils + si] - s_f[k * pencils + si];

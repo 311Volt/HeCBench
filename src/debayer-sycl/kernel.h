@@ -29,7 +29,7 @@ void malvar_he_cutler_demosaic (
     apron[apron_read_row * apron_cols + apron_read_col] = tex2D_at(PixelT, input_image, ag_r, ag_c);
   }
 
-  item.barrier(access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //valid tasks read from [half_ksize, (tile_rows|tile_cols) + kernel_size - 1)
   const uint a_c = tile_col + half_ksize;

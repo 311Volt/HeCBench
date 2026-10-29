@@ -38,7 +38,7 @@ void reduceInWarp(volatile float * f, int idInWarp,
     if (idInWarp < i) {
       f[idInWarp] += f[idInWarp + i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   if (idInWarp < 32){
     f[idInWarp] += f[idInWarp + 32];
@@ -140,12 +140,12 @@ void device_cbow(
             for (int c = idInWarp; c < layer1_size; c+=THREADS_PER_WORD){
               f[idInWarp] += neu1[c] * d_syn1neg[c + l2];   
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             // Do reduction here;
             reduceInWarp(f, idInWarp, item);
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             float g;
             if (f[0] > MAX_EXP)

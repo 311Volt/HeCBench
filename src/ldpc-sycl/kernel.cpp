@@ -257,7 +257,7 @@ void ldpc_cnp_kernel(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // The 2nd recursion
   //#pragma unroll

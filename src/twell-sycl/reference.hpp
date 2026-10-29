@@ -47,10 +47,10 @@ static sycl::event gemm_nt(sycl::queue& q, const T* A, const T* B, float* C,
                 Bs[ly][lx] = (col < N && t + ly < K)
                                  ? static_cast<float>(B[static_cast<long>(col) * K + t + ly])
                                  : 0.0f;
-                it.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(it.get_group());
                 #pragma unroll
                 for (int k = 0; k < TS; ++k) acc += As[ly][k] * Bs[k][lx];
-                it.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(it.get_group());
             }
             if (row < M && col < N) C[static_cast<long>(row) * N + col] = acc;
         });
@@ -80,10 +80,10 @@ static sycl::event gemm_nn_down(sycl::queue& q, const float* H, const T* DOWN,
                                  ? static_cast<float>(
                                        DOWN[static_cast<long>(t + ly) * hidden + col])
                                  : 0.0f;
-                it.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(it.get_group());
                 #pragma unroll
                 for (int k = 0; k < TS; ++k) acc += As[ly][k] * Bs[k][lx];
-                it.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(it.get_group());
             }
             if (row < M && col < hidden)
                 OUT[static_cast<long>(row) * hidden + col] = static_cast<T>(acc);

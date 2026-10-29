@@ -27,7 +27,7 @@ const int APPROX_M_BLOCKSIZE_X = 128;
 
 #define BORDER_PIXEL {0,0,0}
 
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space);
+#define syncthreads() sycl::group_barrier(item.get_group());
 
 pixel pixel_from_uchar4(uchar4 uc4){
   pixel pix;

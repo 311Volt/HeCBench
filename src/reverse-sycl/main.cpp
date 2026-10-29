@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
           sycl::nd_range<1>(gws, lws), [=](sycl::nd_item<1> item) {
           int t = item.get_local_id(0);
           s[t] = d_test[t];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           d_test[t] = s[len-t-1];
         });
       });
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
           sycl::nd_range<1>(gws, lws), [=](sycl::nd_item<1> item) {
           int t = item.get_local_id(0);
           s[t] = d_test[t];
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           d_test[t] = s[len-t-1];
         });
       });

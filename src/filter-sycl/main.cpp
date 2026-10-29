@@ -48,7 +48,7 @@ void filter(int *__restrict d_output,
 
   // zero the counter
   if (item.get_local_id(0) == 0) l_n = 0;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // get the value, evaluate the predicate, and
   // increment the counter if needed
@@ -64,7 +64,7 @@ void filter(int *__restrict d_output,
       pos = ao.fetch_add(1);
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // leader increments the global counter
   if(item.get_local_id(0) == 0) {
@@ -74,14 +74,14 @@ void filter(int *__restrict d_output,
               sycl::access::address_space::global_space> (d_nres[0]);
     l_n = ao.fetch_add(l_n);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // threads with true predicates write their elements
   if(i < num_elems && d > 0) {
     pos += l_n; // increment local pos by global counter
     d_output[pos] = d;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 }
 
 int atomicAggInc(int *ctr) {

@@ -40,7 +40,7 @@ void target_inner_3d_kernel(
   if (ti < 2*R && tj < 2*R && tk< 2*R)
     s_u[NDIM+ti][NDIM+tj][NDIM+tk] = 0.f;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   const llint sui = ti + R;
   const llint suj = tj + R;
@@ -53,7 +53,7 @@ void target_inner_3d_kernel(
   s_u[sui][suj][tk] = u[IDX3(i,j,k-R)];
   s_u[sui][suj][tk+NDIM] = u[IDX3(i,j,k+R)];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (i > x4-1 || j > y4-1 || k > z4-1) { return; }
 
@@ -105,7 +105,7 @@ void target_pml_3d_kernel(
   if (ti < 2*R && tj < 2*R && tk< 2*R)
     s_u[NDIM+ti][NDIM+tj][NDIM+tk] = 0.f;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   const llint sui = ti + R;
   const llint suj = tj + R;
@@ -118,7 +118,7 @@ void target_pml_3d_kernel(
   s_u[sui][suj][tk] = u[IDX3(i,j,k-R)];
   s_u[sui][suj][tk+NDIM] = u[IDX3(i,j,k+R)];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (i > x4-1 || j > y4-1 || k > z4-1) { return; }
 

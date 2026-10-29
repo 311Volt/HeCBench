@@ -16,7 +16,7 @@
 #define reduce_block_size 256
 #endif
 
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define syncthreads() sycl::group_barrier(item.get_group())
 
 template <typename T>
 class computeCost;

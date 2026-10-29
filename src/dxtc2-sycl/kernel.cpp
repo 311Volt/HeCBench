@@ -329,21 +329,21 @@ int findMinError(sycl::nd_item<1> &item, sycl::local_ptr<float> errors,
 
     indices[idx] = idx;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int d = NUM_THREADS / 2; d > 0; d >>= 1) {
       float err0 = errors[idx];
       float err1 = (idx + d) < NUM_THREADS ? errors[idx + d] : FLT_MAX;
       int index1 = (idx + d) < NUM_THREADS ? indices[idx + d] : 0;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (err1 < err0) {
         errors[idx] = err1;
         indices[idx] = index1;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     return indices[0];
 }

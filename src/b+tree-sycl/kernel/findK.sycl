@@ -17,12 +17,12 @@ for(i = 0; i < maxheight; i++){
       offsetD_acc[bid] = knodesD_acc[offsetD_acc[bid]].indices[thid];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // set for next tree level
   if(thid==0){
     currKnodeD_acc[bid] = offsetD_acc[bid];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 }
 

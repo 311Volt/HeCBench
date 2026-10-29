@@ -23,7 +23,7 @@ for (int tx = tid; tx < BLOCK_SIZE; tx += nthreads)
     sm[tx] = d_gpuSrc[blkX+tx];
 }
 
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 int cur = 0;
 for (int i = 0; i < iteration; i++)
@@ -46,7 +46,7 @@ for (int i = 0; i < iteration; i++)
   }
 
   cur = next;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 }
 
 const int last = iteration-1;

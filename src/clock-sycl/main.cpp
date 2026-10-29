@@ -43,7 +43,7 @@ static void timedReduction(const float *input, float *output, uint64_t *timer,
     // Perform reduction to find minimum.
     for (int d = item.get_local_range(0); d > 0; d /= 2)
     {
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if (tid < d)
         {
@@ -60,7 +60,7 @@ static void timedReduction(const float *input, float *output, uint64_t *timer,
     // Write result.
     if (tid == 0) output[bid] = shared[0];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (tid == 0) timer[bid + item.get_group_range(0)] = syclex::clock<syclex::clock_scope::work_group>();
 }

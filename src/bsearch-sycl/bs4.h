@@ -28,7 +28,7 @@ void bs4 (sycl::queue &q,
            while (n >> nbits) nbits++;
            k[0] = 1UL << (nbits - 1);
          }
-         item.barrier(sycl::access::fence_space::local_space);
+         sycl::group_barrier(item.get_group());
 
          size_t p = k[0];
          T z = d_z[i];

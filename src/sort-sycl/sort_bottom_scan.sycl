@@ -29,7 +29,7 @@ if (lid < 16)
   l_scanned_seeds[lid] =
     isums[(lid*group_range)+group];
 }
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 // Scan multiple elements per thread
 while (window < block_stop)
@@ -63,19 +63,19 @@ while (window < block_stop)
     lmem[idx] = 0;
     idx += local_range;
     lmem[idx] = histogram[digit];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     T t;
     for (int i = 1; i < local_range; i *= 2)
     {
       t = lmem[idx -  i]; 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       lmem[idx] += t;     
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     histogram[digit] = lmem[idx-1];
 
     //histogram[digit] = scanLocalMem(histogram[digit], lmem, 1);
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (i < block_stop) // Make sure we don't write out of bounds
@@ -100,7 +100,7 @@ while (window < block_stop)
 
   // Before proceeding, make sure everyone has finished their current
   // indexing computations.
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // Now update the seed array.
   if (lid == local_range-1)
   {
@@ -109,7 +109,7 @@ while (window < block_stop)
       l_block_counts[q] += histogram[q];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Advance window
   window += local_range;

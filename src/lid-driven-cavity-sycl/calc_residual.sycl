@@ -40,7 +40,7 @@ res2 = ((p_ip1j - (TWO * p_ij) + p_im1j) / (dx * dx))
   sum_cache[lid] = (res * res) + (res2 * res2);
 
   // synchronize threads in block to ensure all residuals stored
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // add up squared residuals for block
   int i = BLOCK_SIZE >> 1;
@@ -48,7 +48,7 @@ res2 = ((p_ip1j - (TWO * p_ij) + p_im1j) / (dx * dx))
     if (lid < i) {
       sum_cache[lid] += sum_cache[lid + i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     i >>= 1;
   }
 

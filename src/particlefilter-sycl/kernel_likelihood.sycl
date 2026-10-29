@@ -24,7 +24,7 @@ if(i < Nparticles){
   arrayY_d[i] += -2.0f + 2.0f*(sycl::sqrt(-2.0f*sycl::log(u))*sycl::cos(2.0f*PI*v));
 }
 
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 
 if(i < Nparticles)
@@ -55,7 +55,7 @@ if(i < Nparticles)
 
 weights_local[thread_id] = (i < Nparticles) ?  weights_d[i] : 0.f;
 
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 for(unsigned int s=BLOCK_SIZE/2; s>0; s>>=1)
 {
@@ -63,7 +63,7 @@ for(unsigned int s=BLOCK_SIZE/2; s>0; s>>=1)
   {
     weights_local[thread_id] += weights_local[thread_id + s];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 }
 
 if(thread_id == 0)

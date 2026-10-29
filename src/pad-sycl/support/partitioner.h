@@ -138,7 +138,7 @@ inline int gpu_first(Partitioner *p, sycl::nd_item<1> &item) {
         if(item.get_local_id(0) == 0) {
             p->tmp[0] = atomicAdd<sycl::memory_scope::system>(*(p->worklist), 1);
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         p->current = p->tmp[0];
     } else
 #endif
@@ -197,7 +197,7 @@ inline int gpu_next(Partitioner *p, sycl::nd_item<1> &item) {
         if(item.get_local_id(0) == 0) {
             p->tmp[0] = atomicAdd<sycl::memory_scope::system>(*(p->worklist), 1);
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         p->current = p->tmp[0];
     } else
 #endif

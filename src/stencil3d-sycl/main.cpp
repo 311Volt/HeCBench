@@ -63,7 +63,7 @@ void stencil3d(
   sm_psi[nii*BSIZE*BSIZE+tjj*BSIZE+tkk] = psi(1,tjj,tkk);
   Real xcharge,ycharge,zcharge,dV = 0;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //initial
   if ((tkk>0) && (tkk<nLast_z) && (tjj>0) && (tjj<nLast_y))
@@ -79,7 +79,7 @@ void stencil3d(
   for(int ii=1;ii<nLast_x;ii++)
   {
     sm_psi[nii*BSIZE*BSIZE+tjj*BSIZE+tkk] = psi(ii+1,tjj,tkk);
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // y face current
     if ((tkk>0) && (tkk<nLast_z) && (tjj<nLast_y))
@@ -91,12 +91,12 @@ void stencil3d(
       dV += ycharge;
       sm_psi[3*BSIZE*BSIZE+tjj*BSIZE+tkk]=ycharge;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if ((tkk>0) && (tkk<nLast_z) && (tjj>0) && (tjj<nLast_y))
       dV -= sm_psi[3*BSIZE*BSIZE+(tjj-1)*BSIZE+tkk];  //bring from left
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // z face current
     if ((tkk<nLast_z) && (tjj>0) && (tjj<nLast_y))
@@ -109,11 +109,11 @@ void stencil3d(
       sm_psi[3*BSIZE*BSIZE+tjj*BSIZE+tkk]=zcharge;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if ((tkk>0) && (tkk<nLast_z) && (tjj>0) && (tjj<nLast_y))
       dV -= sm_psi[3*BSIZE*BSIZE+tjj*BSIZE+tkk-1];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // x face current
     if ((tkk>0) && (tkk<nLast_z) && (tjj>0) && (tjj<nLast_y))
@@ -126,7 +126,7 @@ void stencil3d(
       npsi(ii,tjj,tkk) = dV; //store dV
       dV = -xcharge; //pass to the next cell in x-dir
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     tii=pii; pii=cii; cii=nii; nii=tii;
   }
 }

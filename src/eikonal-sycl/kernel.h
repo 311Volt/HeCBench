@@ -16,7 +16,7 @@
 #define SOL(i,j,k) _sol[i][j][k]
 #define SPD(i,j,k) _spd[i][j][k]
 
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 DOUBLE get_time_eikonal(DOUBLE a, DOUBLE b, DOUBLE c, DOUBLE s);
 //

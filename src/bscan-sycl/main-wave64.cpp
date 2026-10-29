@@ -73,7 +73,7 @@ inline int block_binary_prefix_sums(sycl::nd_item<1> &item, int *sdata, int x)
     printf("B %d %d\n", warpIdx, sdata[warpIdx]);
 #endif
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // C. One warp scans the warp partial sums
   if (idx < warpSize) {
@@ -82,7 +82,7 @@ inline int block_binary_prefix_sums(sycl::nd_item<1> &item, int *sdata, int x)
     printf("C: %d %d\n", idx, sdata[idx]);
 #endif
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // D. Each thread adds prefix sums of warp partial
   // sums to its own intra−warp prefix sums

@@ -57,7 +57,7 @@ void welford_reduce_mean_m2n(
       count[wid] = num;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (wid == 0) {
       mean = (thread_id < warp.get_group_linear_range()) ? x[lane*2] : T(0);

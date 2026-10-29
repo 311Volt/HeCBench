@@ -60,7 +60,7 @@ reduceMinAndMax(T* const minBuffer, T* const maxBuffer, int const blockEnd,
         maxBuffer[idx] = sycl::max(maxBuffer[idx], maxBuffer[d + idx]);
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 
@@ -123,7 +123,7 @@ void bitPackConfigScanKernel(
     minBuffer[lid] = localMin;
     maxBuffer[lid] = localMax;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // cooperatively compute min and max
     reduceMinAndMax(minBuffer, maxBuffer, lastThread, item);
@@ -170,7 +170,7 @@ void bitPackConfigFinalizeKernel(
   // load data
   readMinAndMax(inMin, inMax, minBuffer, maxBuffer, 0, num, item);
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // cooperatively compute min and max
   reduceMinAndMax(minBuffer, maxBuffer, sycl::min(BLOCK_SIZE, (int)num), item);
@@ -242,7 +242,7 @@ void bitPackKernel(
     OUTPUT val = 0;
     for (int bufferStart = blockStartIdx; bufferStart < blockEndIdx;
          bufferStart += BLOCK_SIZE) {
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       // fill input buffer
       int const inputIdx = bufferStart + lid;
@@ -250,7 +250,7 @@ void bitPackKernel(
         inBuffer[lid] = in[inputIdx] - valueOffset;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       int const currentStartIdx = sycl::max(startIdx, bufferStart);
       int const currentEndIdx =

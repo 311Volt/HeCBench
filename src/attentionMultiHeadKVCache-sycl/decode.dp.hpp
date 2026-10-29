@@ -170,7 +170,7 @@ inline void sync_state(AttentionVariant variant, state_t<vec_size> &st,
     if constexpr (variant.use_softmax) {
       smem_md[(tz * bdy + ty) * 2] = st.m;
       smem_md[(tz * bdy + ty) * 2 + 1] = st.d;
-      item_ct1.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item_ct1.get_group());
       st.init();
 #pragma unroll
       for (uint32_t j = 0; j < bdz; ++j) {
@@ -180,7 +180,7 @@ inline void sync_state(AttentionVariant variant, state_t<vec_size> &st,
         st.merge(oz, mz, dz);
       }
     } else {
-      item_ct1.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item_ct1.get_group());
       st.init();
 #pragma unroll
       for (uint32_t j = 0; j < bdz; ++j) {
@@ -276,7 +276,7 @@ void SingleDecodeWithKVCacheKernel(const Params params,
     // do not apply rotary embedding to q matrix
     q_vec.cast_load(q + qo_head_idx * q_stride_h + tx * vec_size);
   }
-  item_ct1.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item_ct1.get_group());
 
   uint32_t chunk_start = kv_chunk_idx * kv_chunk_size;
   kv_chunk_size = sycl::min(kv_chunk_size, seq_len - chunk_start);
@@ -317,14 +317,14 @@ void SingleDecodeWithKVCacheKernel(const Params params,
   for (uint32_t iter = 0; iter < ceil_div(kv_chunk_size, tile_size_per_bdx * bdy * bdz); ++iter) {
     // compute qk
     cp_async::wait_group<2 * num_stages_smem - 1>();
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
     compute_qk<pos_encoding_mode, vec_size, bdx, bdy * tile_size_per_bdx>(
         params, variant, /*batch_idx=*/0,
         k_smem + (stage_idx * bdz + tz) * bdy * tile_size_per_bdx * head_dim,
         q_vec, freq, consumer_kv_idx_base, iter * bdy * tile_size_per_bdx * bdz,
         kv_chunk_size, qo_head_idx, kv_head_idx, s, st_local, tx, ty, tz,
         item_ct1);
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
     // load k
     for (uint32_t j = 0; j < tile_size_per_bdx; ++j) {
       cp_async::pred_load<vec_bits, PrefetchMode::kPrefetch, SharedMemFillMode::kNoFill>(
@@ -338,11 +338,11 @@ void SingleDecodeWithKVCacheKernel(const Params params,
 
     // update m/d/o state
     cp_async::wait_group<2 * num_stages_smem - 1>();
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
     update_local_state<vec_size, bdx, bdy * tile_size_per_bdx>(
         v_smem + (stage_idx * bdz + tz) * bdy * tile_size_per_bdx * head_dim, s, stage_idx,
         st_local, tx);
-    item_ct1.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item_ct1.get_group());
 
     // load v
     for (uint32_t j = 0; j < tile_size_per_bdx; ++j) {
@@ -360,7 +360,7 @@ void SingleDecodeWithKVCacheKernel(const Params params,
     consumer_kv_idx_base += tile_size_per_bdx * bdy * bdz;
   }
   cp_async::wait_group<0>();
-  item_ct1.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item_ct1.get_group());
 
   // sync local state of all warps inside a threadblock
   sync_state<vec_size, bdx, bdy, bdz>(variant, st_local,

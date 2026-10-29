@@ -109,7 +109,7 @@ void FW0_64(mtype* const __restrict AdjMat, const int upper,
     if (warp_b == k) krow[idx2_a] = ij_ba;
     if (warp_b == k) krow[idx2_b] = ij_bb;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     mtype ik_a, ik_b;
 
@@ -143,7 +143,7 @@ void FW0_64(mtype* const __restrict AdjMat, const int upper,
     idx2_b += tile;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   kcols[idx0_aa] = temp[warp_a * tile + lane_a];
   kcols[idx0_ab] = temp[warp_a * tile + lane_b];
@@ -193,7 +193,7 @@ void FWrowcol_64(mtype* const __restrict AdjMat, const int upper,
     temp[warp_b * tile + lane_a] = kcols[i_b * upper + lane_a + x * tile];
     temp[warp_b * tile + lane_b] = kcols[i_b * upper + lane_b + x * tile];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     mtype ij_aa = AdjMat[idx0_aa];
     mtype ij_ab = AdjMat[idx0_ab];
@@ -212,7 +212,7 @@ void FWrowcol_64(mtype* const __restrict AdjMat, const int upper,
       if (warp_b == k) krow[idx2_a] = ij_ba;
       if (warp_b == k) krow[idx2_b] = ij_bb;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       const mtype ik_a = temp[idx1_a];
       const mtype ik_b = temp[idx1_b];
@@ -300,7 +300,7 @@ void FWrowcol_64(mtype* const __restrict AdjMat, const int upper,
       idx2_b += upper;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     kcols[idx0_aa] = temp[warp_a * tile + lane_a];
     kcols[idx0_ab] = temp[warp_a * tile + lane_b];
@@ -362,7 +362,7 @@ void FWrem_64(mtype* const __restrict AdjMat,
   const mtype orig_ba = ij_ba;
   const mtype orig_bb = ij_bb;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int idx1_a = warp_a;
   int idx1_b = warp_b;
@@ -387,7 +387,7 @@ void FWrem_64(mtype* const __restrict AdjMat,
     idx2_b += tile;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if ((y == z) && (y == x + 1) && (x != subm1)) { // the diagonal in next iteration
     const int idx1_aa = lane_a * tile + warp_a;
@@ -416,7 +416,7 @@ void FWrem_64(mtype* const __restrict AdjMat,
         ik_b = sycl::select_from_group(sg, ij_bb, k - ws);
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       const mtype sk_a = s_kj[idx2_a];
       const mtype sk_b = s_kj[idx2_b];
@@ -439,7 +439,7 @@ void FWrem_64(mtype* const __restrict AdjMat,
       idx2_b += tile;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     kcols[idx0_aa] = s_ik[warp_a * tile + lane_a];
     kcols[idx0_ab] = s_ik[warp_a * tile + lane_b];

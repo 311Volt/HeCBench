@@ -149,7 +149,7 @@ int main(int argc, char **argv){
                 r_GwJ = o_ggeo[gbase + p_GWJID * 512];
                 r_lam0 = o_lambda[id + 0 * offset];
                 r_lam1 = o_lambda[id + 1 * offset];
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 s_U[j*8+i] = r_U[k];
                 s_V[j*8+i] = r_V[k];
                 s_W[j*8+i] = r_W[k];
@@ -163,7 +163,7 @@ int main(int argc, char **argv){
                   r_Vt += Dkm * r_V[m];
                   r_Wt += Dkm * r_W[m];
                 }
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 dfloat Ur = 0, Us = 0;
                 dfloat Vr = 0, Vs = 0;
                 dfloat Wr = 0, Ws = 0;
@@ -190,7 +190,7 @@ int main(int argc, char **argv){
                 r_AU[k] += r_GwJ * r_lam1 * r_U[k];
                 r_AV[k] += r_GwJ * r_lam1 * r_V[k];
                 r_AW[k] += r_GwJ * r_lam1 * r_W[k];
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 dfloat AUtmp = 0, AVtmp = 0, AWtmp = 0;
 #pragma unroll 8
                 for (int m = 0; m < 8; m++) {
@@ -258,14 +258,14 @@ int main(int argc, char **argv){
                 r_GwJ = o_ggeo[gbase + p_GWJID * 512];
                 r_lam0 = o_lambda[id + 0 * offset];
                 r_lam1 = o_lambda[id + 1 * offset];
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 s_q[j*8+i] = r_q[k];
                 r_qt = 0;
 #pragma unroll 8
                 for (int m = 0; m < 8; ++m) {
                   r_qt += s_D[k*8+m] * r_q[m];
                 }
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 dfloat qr = 0;
                 dfloat qs = 0;
 #pragma unroll 8
@@ -277,7 +277,7 @@ int main(int argc, char **argv){
                 s_Gqr[j*8+i] = r_lam0 * (r_G00 * qr + r_G01 * qs + r_G02 * r_qt);
                 r_Gqt = r_lam0 * (r_G02 * qr + r_G12 * qs + r_G22 * r_qt);
                 r_Auk = r_GwJ * r_lam1 * r_q[k];
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
 #pragma unroll 8
                 for (int m = 0; m < 8; ++m) {
                   r_Auk += s_D[m*8+j] * s_Gqs[m*8+i];
@@ -285,7 +285,7 @@ int main(int argc, char **argv){
                   r_Auk += s_D[m*8+i] * s_Gqr[j*8+m];
                 }
                 r_Aq[k] += r_Auk;
-                item.barrier(sycl::access::fence_space::local_space);
+                sycl::group_barrier(item.get_group());
                 }
 #pragma unroll 8
                 for (int k = 0; k < 8; ++k) {

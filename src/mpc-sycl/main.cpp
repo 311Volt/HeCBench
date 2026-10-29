@@ -66,7 +66,7 @@ void prefixsum(int &val, int sbuf[TPB], sycl::nd_item<1> &item)
   }
   if (lane == WarpSize - 1) sbuf[warp] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp == 0) {
     int v = sbuf[lane];
@@ -77,7 +77,7 @@ void prefixsum(int &val, int sbuf[TPB], sycl::nd_item<1> &item)
     sbuf[lane] = v;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp > 0) {
     val += sbuf[warp - 1];
@@ -100,7 +100,7 @@ void prefixsumlong(long &val, long sbuf[TPB], sycl::nd_item<1> &item)
   }
   if (lane == WarpSize - 1) sbuf[warp] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp == 0) {
     long v = sbuf[lane];
@@ -112,7 +112,7 @@ void prefixsumlong(long &val, long sbuf[TPB], sycl::nd_item<1> &item)
     sbuf[lane] = v;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp > 0) {
     val += sbuf[warp - 1];
@@ -138,7 +138,7 @@ void prefixsumdimlong(long &val, long sbuf[TPB], const unsigned char dim,
   }
   if ((lane + dim) > (WarpSize - 1)) sbuf[tix] = val;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp < dim) {
     const int idx = (lane * dim) + warp;
@@ -151,7 +151,7 @@ void prefixsumdimlong(long &val, long sbuf[TPB], const unsigned char dim,
     sbuf[idx] = v;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (warp > 0) {
     val += sbuf[tix - dim];
@@ -213,7 +213,7 @@ void MPCcompress(
       sbuf1[tid] = v1;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (tid >= dim) {
       if (idx < n) {
@@ -222,7 +222,7 @@ void MPCcompress(
     }
     sbuf2[tid] = v1;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     long v2 = 0;
 
@@ -231,7 +231,7 @@ void MPCcompress(
     }
     sbuf1[tid] = v2;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (tid > 0) {
       v2 -= sbuf1[tidm1];
@@ -251,7 +251,7 @@ void MPCcompress(
         sbuf2[tid] = bitmap;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (lanex == 0) {
         if (idx < n) compressed[1 + idx / 64] = (sbuf2[tid + 32] << 32) + bitmap;
@@ -280,7 +280,7 @@ void MPCcompress(
       start = st;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (tid < top) {
       compressed[start + tid] = sbuf2[tid];
@@ -341,7 +341,7 @@ void MPCdecompress(
     }
     int loc = flag;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     prefixsum<WarpSize>(loc, (int *)sbuf1, item);
 
@@ -358,13 +358,13 @@ void MPCdecompress(
       start = st;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if (tid < top) {
       sbuf2[tid] = compressed[start + tid];
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     long v2 = 0;
     if (flag != 0) {
@@ -375,7 +375,7 @@ void MPCdecompress(
 
     sbuf2[tid] = v2;
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     long v1 = 0;
     for (int i = 63; i >= 0; i--) {

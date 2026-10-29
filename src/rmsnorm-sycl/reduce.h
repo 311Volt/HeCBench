@@ -41,13 +41,13 @@ T BlockReduce(const T &val, T *smem, sycl::nd_item<3> &item) {
     if (lane_id == 0) {
         smem[warp_id] = val_reg;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (warp_id == 0) {
         val_reg = (lane_id < num_warps) ? smem[lane_id] : Func<T>::init();
         val_reg = WarpReduce<Func, T, THREADS_PER_WARP>(val_reg, item);
         if (lane_id == 0)
             smem[0] = val_reg;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     return smem[0];
 }

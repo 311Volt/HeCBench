@@ -100,7 +100,7 @@ void groupnorm_forward_kernel(
     // store warp sum into shared memory
     shared_sum[warp_id] = warp_sum;
     shared_sum2[warp_id] = warp_sum2;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // load warp sums from shared memory
     warp_sum = (lane_id < num_warps) ? shared_sum[lane_id] : 0.0f;
@@ -190,7 +190,7 @@ void groupnorm_forward_kernel2(const float *__restrict__ x,
     // store warp sum into shared memory
     shared_sum[warp_id] = warp_sum;
     shared_sum2[warp_id] = warp_sum2;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // load warp sums from shared memory
     warp_sum = (lane_id < num_warps) ? shared_sum[lane_id] : 0.0f;
@@ -270,7 +270,7 @@ void groupnorm_backward_kernel(
     // store warp sum in shared mem
     shared_sum[warp_id] = w_dout_warp;
     shared_sum2[warp_id] = w_dout_norm_warp;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // load warp sums from shared memory
     w_dout_warp = (lane_id < num_warps) ? shared_sum[lane_id] : 0.0f;
@@ -326,7 +326,7 @@ void groupnorm_backward_kernel(
                 shared_sum[warp_id] = dw_warp;
                 shared_sum2[warp_id] = db_warp;
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             // use the first thread to reduce the shared memory sums and save to global memory
             if (item.get_local_id(2) == 0) {
                 float dw_block = 0.0f;

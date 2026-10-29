@@ -44,14 +44,14 @@ void reduce(sycl::nd_item<1> &item, int *l_count, int local_cnt, int *l_data) {
   const int localSize = item.get_local_range(0);
   // load shared mem
   l_data[tid] = local_cnt;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // do reduction in shared mem
   for(int s = localSize >> 1; s > 0; s >>= 1) {
     if(tid < s) {
       l_data[tid] += l_data[tid + s];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   // write result for this block to global mem
   if(tid == 0)
@@ -67,7 +67,7 @@ int block_binary_prefix_sums(sycl::nd_item<1> &item, int *l_count, int x, int *l
   // Build up tree
   int offset = 1;
   for(int l = length >> 1; l > 0; l >>= 1) {
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if(tid < l) {
       int ai = offset * (2 * tid + 1) - 1;
       int bi = offset * (2 * tid + 2) - 1;
@@ -83,16 +83,16 @@ int block_binary_prefix_sums(sycl::nd_item<1> &item, int *l_count, int x, int *l
   for(int d = 0; d < maxThread; d <<= 1) {
     d += 1;
     offset >>= 1;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if(tid < d) {
       int ai = offset * (tid + 1) - 1;
       int bi = ai + (offset >> 1);
       l_data[bi] += l_data[ai];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   int output = l_data[tid] + *l_count - x;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if(tid == localSize - 1)
     *l_count += l_data[tid];
 
@@ -129,7 +129,7 @@ void StreamCompaction (sycl::nd_item<1> &item,
     if(tid == 0) {
       l_count[0] = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int local_cnt = 0;
     // Declare on-chip memory
@@ -167,7 +167,7 @@ void StreamCompaction (sycl::nd_item<1> &item,
       l_count[0] = p_count - 1;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Store to global memory
 #pragma unroll

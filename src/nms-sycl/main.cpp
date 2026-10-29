@@ -218,13 +218,13 @@ int main(int argc, char *argv[])
         int lid = item.get_local_id(0);
         int idx = bid * MAX_DETECTIONS + lid;
 
-        pointsbitmap[bid] = (item.barrier(sycl::access::fence_space::local_space),
+        pointsbitmap[bid] = (sycl::group_barrier(item.get_group()),
                              sycl::all_of_group(g, nmsbitmap[idx]));
 
         for(int i=0; i<(N_PARTITIONS-1); i++)
         {
           idx += MAX_DETECTIONS / N_PARTITIONS;
-          pointsbitmap[bid] = (item.barrier(sycl::access::fence_space::local_space),
+          pointsbitmap[bid] = (sycl::group_barrier(item.get_group()),
                               sycl::all_of_group(g, pointsbitmap[bid] && nmsbitmap[idx]));
         }
       });

@@ -77,7 +77,7 @@ void device_chain_tiled(
 
   for (int i = BACK_SEARCH_COUNT_GPU, curr_idx = 0; curr_idx < TILE_SIZE; i++, curr_idx++) {
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     anchor_dt curr;
     *((short4*)&curr) = ((short4*)active)[i % BACK_SEARCH_COUNT_GPU];
     score_dt f_curr = max_tracker[i % BACK_SEARCH_COUNT_GPU];
@@ -88,24 +88,24 @@ void device_chain_tiled(
     }
 
     /* read in new query anchor, put into active array*/
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (id == i % BACK_SEARCH_COUNT_GPU) {
       ((short4*)active)[id] = ((short4*)a)[ofs * TILE_SIZE_ACTUAL + i];
       max_tracker[id] = 0;
       j_tracker[id] = -1;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     score_dt sc = chain_dp_score(active, curr,
         control.avg_qspan, max_dist_x, max_dist_y, bw, id);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (sc + f_curr >= max_tracker[id]) {
       max_tracker[id] = sc + f_curr;
       j_tracker[id] = (parent_dt)curr_idx + (parent_dt)control.tile_num * TILE_SIZE;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (id == curr_idx % BACK_SEARCH_COUNT_GPU) {
       return_dt tmp;
       tmp.score = f_curr;
@@ -114,7 +114,7 @@ void device_chain_tiled(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   max_tracker_g[ofs * BACK_SEARCH_COUNT_GPU + id] = max_tracker[id];
   j_tracker_g[ofs * BACK_SEARCH_COUNT_GPU + id] = j_tracker[id];
 }

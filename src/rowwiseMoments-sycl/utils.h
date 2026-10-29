@@ -41,11 +41,11 @@ BlockReduce(T val, const ReduceOp& op, const T& identity_element, T* shared,
   const int lid = tid % WARP_SIZE;
   const int wid = tid / WARP_SIZE;
   val = WarpReduce(val, op, item);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (lid == 0) {
     shared[wid] = val;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   val = (tid < B::Warps(item)) ? shared[lid] : identity_element;
   if (wid == 0) {
     val = WarpReduce(val, op, item);

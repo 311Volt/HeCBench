@@ -468,7 +468,7 @@ void kernel_filter(
   for (int i = lid + start; i < end; i += 128) {
     result[lid] += sycl::min(table[indexs[i]], orders[i]);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (lid == 0) {
     for (int i=1; i<128; i++) {

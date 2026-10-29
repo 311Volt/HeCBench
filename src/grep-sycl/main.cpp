@@ -192,7 +192,7 @@ int main(int argc, char **argv)
                        pnstate, device_match_state);
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       List d1;
       List d2;  

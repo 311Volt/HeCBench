@@ -76,13 +76,13 @@ void softmax_jacobian_k1(sycl::queue& q, const T* input, T* jac, int dim,
           T lmax = -std::numeric_limits<T>::infinity();
           for (int i = tid; i < dim; i += nt) lmax = x[i] > lmax ? x[i] : lmax;
           red[tid] = lmax;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           for (int s = nt >> 1; s > 0; s >>= 1) {
             if (tid < s) red[tid] = sycl::fmax(red[tid], red[tid + s]);
-            it.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(it.get_group());
           }
           const T maxv = red[0];
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
 
           T lsum = 0;
           for (int i = tid; i < dim; i += nt) {
@@ -91,16 +91,16 @@ void softmax_jacobian_k1(sycl::queue& q, const T* input, T* jac, int dim,
             lsum += e;
           }
           red[tid] = lsum;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           for (int s = nt >> 1; s > 0; s >>= 1) {
             if (tid < s) red[tid] += red[tid + s];
-            it.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(it.get_group());
           }
           const T inv = (T)1 / red[0];
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
 
           for (int i = tid; i < dim; i += nt) y[i] *= inv;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
 
           const size_t total = (size_t)dim * dim;
           for (size_t idx = tid; idx < total; idx += nt) {
@@ -148,14 +148,14 @@ void softmax_jacobian_k2(sycl::queue& q, const T* input, T* jac, int dim,
           for (int i = tid; i < dim; i += nt) lmax = x[i] > lmax ? x[i] : lmax;
           lmax = sycl::reduce_over_group(sg, lmax, sycl::maximum<T>{});
           if (lane == 0) wpart[warp] = lmax;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           if (warp == 0) {
             T v = (lane < nwarps) ? wpart[lane]
                                   : -std::numeric_limits<T>::infinity();
             v = sycl::reduce_over_group(sg, v, sycl::maximum<T>{});
             if (lane == 0) wpart[0] = v;
           }
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           const T maxv = wpart[0];
 
           // ---- exp + sum reduction: same sub-group pattern ----
@@ -167,17 +167,17 @@ void softmax_jacobian_k2(sycl::queue& q, const T* input, T* jac, int dim,
           }
           lsum = sycl::reduce_over_group(sg, lsum, sycl::plus<T>{});
           if (lane == 0) wpart[warp] = lsum;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           if (warp == 0) {
             T v = (lane < nwarps) ? wpart[lane] : (T)0;
             v = sycl::reduce_over_group(sg, v, sycl::plus<T>{});
             if (lane == 0) wpart[0] = v;
           }
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           const T inv = (T)1 / wpart[0];
 
           for (int i = tid; i < dim; i += nt) y[i] *= inv;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
 
           // ---- Jacobian: J[i*dim + j] = y_i * (delta_ij - y_j) ----
           if ((dim & 3) == 0) {

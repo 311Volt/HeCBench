@@ -142,7 +142,7 @@ void run_gpu_kernel(
               shared[lid * 5 + 3] = d_charge[jatom + lid];
               shared[lid * 5 + 4] = d_size[jatom + lid];
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             for(int i=0; i<lsize; i++) {
               sycl::float4 dx = lgx - shared[i * 5         ];
@@ -153,7 +153,7 @@ void run_gpu_kernel(
                 sycl::exp( -xkappa * (dist - shared[i * 5 + 4])) /
                 (1.0f + xkappa * shared[i * 5 + 4]);
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
           reinterpret_cast<sycl::float4*>(d_val)[ igrid ] = v;
         });
@@ -181,7 +181,7 @@ void run_gpu_kernel(
               shared[lid + 3*lsize] = d_charge[jatom + lid];
               shared[lid + 4*lsize] = d_size[jatom + lid];
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             for(int i=0; i<lsize; i++) {
               sycl::float4 dx = lgx - shared[i          ];
@@ -193,7 +193,7 @@ void run_gpu_kernel(
                 (1.0f + xkappa * shared[i + 4*lsize]);
 
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
           reinterpret_cast<sycl::float4*>(d_val)[ igrid ] = v;
         });
@@ -221,7 +221,7 @@ void run_gpu_kernel(
               shared[lid + 3*lsize] = d_charge[jatom + lid];
               shared[lid + 4*lsize] = d_size[jatom + lid];
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             for(int i=0; i<lsize; i++) {
               sycl::float4 dx = lgx - shared[i          ];
@@ -233,7 +233,7 @@ void run_gpu_kernel(
                    (1.0f + xkappa * shared[i + 4*lsize]);
 
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
           }
           reinterpret_cast<sycl::float4*>(d_val)[ igrid ] = v;
         });

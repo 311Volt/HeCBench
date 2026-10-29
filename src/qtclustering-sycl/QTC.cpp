@@ -506,7 +506,7 @@ void QTC(const string& name, OptionParser& op, int matrix_type){
           cnt_sh = 0;
           flag_sh = false;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for(int i = 0; i+tid < point_count; i+=curThreadCount){
           // Have all threads make a coalesced read of contiguous global memory and copy the points assuming they are all good.
@@ -520,7 +520,7 @@ void QTC(const string& name, OptionParser& op, int matrix_type){
             ungrpd_pnts_indr[cnt_sh+tid] = pnt;
           }
 
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           if( 0 == tid ){
             if( flag_sh ){
@@ -537,7 +537,7 @@ void QTC(const string& name, OptionParser& op, int matrix_type){
             }
             flag_sh  = false;
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
       });
     }).wait();

@@ -307,7 +307,7 @@ int main(int argc, char* argv[])
         smaxz[i] = max.z();
 
         for (j = THREADS1 / 2; j > 0; j /= 2) {
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
           if (i < j) {
             k = i + j;
             sminx[i] = min.x() = sycl::fmin(min.x(), sminx[k]);
@@ -488,7 +488,7 @@ int main(int argc, char* argv[])
               }
             }
           }
-          item.barrier(sycl::access::fence_space::local_space);  // optional barrier for performance
+          sycl::group_barrier(item.get_group());  // optional barrier for performance
 
           if (skip == 2) {
             childd[locked] = patch;
@@ -687,7 +687,7 @@ int main(int argc, char* argv[])
             }
             k -= dec;  // move on to next cell
           }
-          item.barrier(sycl::access::fence_space::local_space);  // optional barrier for performance
+          sycl::group_barrier(item.get_group());  // optional barrier for performance
         }
       });
     });

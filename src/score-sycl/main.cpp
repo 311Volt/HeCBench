@@ -47,7 +47,7 @@ void findTopK(int*__restrict indices_,
   for (int unroll = 0; unroll < BINS / BLOCK_SIZE; unroll++)
     bins[unroll * BLOCK_SIZE + threadIdx_x] = 0;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int i = threadIdx_x; i < num_priors; i = i + BLOCK_SIZE)
   {
@@ -78,7 +78,7 @@ void findTopK(int*__restrict indices_,
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   auto sg = item.get_sub_group();
 
@@ -151,7 +151,7 @@ void findTopK(int*__restrict indices_,
 
   if (threadIdx_x == 0) *count = 0;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int i = threadIdx_x; i < num_priors; i = i + BLOCK_SIZE)
   {

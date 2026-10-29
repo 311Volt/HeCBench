@@ -60,18 +60,18 @@ uint4 scan4(sycl::nd_item<1> item, const uint4 idata, uint* ptr)
   uint val = val4.w() + sum[2];
 
   val = scanwarp(item, val, ptr, 4);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if ((idx & (WARP_SIZE - 1)) == WARP_SIZE - 1)
   {
     ptr[idx >> 5] = val + val4.w() + sum[2];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (idx < WARP_SIZE)
     ptr[idx] = scanwarp(item, ptr[idx], ptr, 2);
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   val += ptr[idx >> 5];
 
@@ -94,7 +94,7 @@ uint4 rank4(sycl::nd_item<1> &item, const uint4 preds, uint* sMem, uint &numtrue
   {
     numtrue = address.w() + preds.w();
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   uint4 rank;
   int idx = localId*4;
@@ -121,7 +121,7 @@ void radixSortBlocksKeysK(
 
   uint4 key = reinterpret_cast<uint4*>(keysIn)[globalId];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for(uint shift = startbit; shift < (startbit + nbits); ++shift)
   {
@@ -140,7 +140,7 @@ void radixSortBlocksKeysK(
     sMem[(r.y() & 3) * localSize + (r.y() >> 2)] = key.y();
     sMem[(r.z() & 3) * localSize + (r.z() >> 2)] = key.z();
     sMem[(r.w() & 3) * localSize + (r.w() >> 2)] = key.w();
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // The above allows us to read without 4-way bank conflicts:
     key.x() = sMem[localId];
@@ -148,7 +148,7 @@ void radixSortBlocksKeysK(
     key.z() = sMem[localId + 2 * localSize];
     key.w() = sMem[localId + 3 * localSize];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   reinterpret_cast<uint4*>(keysOut)[globalId] = key;

@@ -199,15 +199,15 @@ int main(int argc, char **argv) {
 
         if(tid == 0) // Dynamic fetch
           lmem[1] = atomicAdd(d_head[0], 1);
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         while(lmem[1] < m) {
           int next_in_cycle = (lmem[1] * A) - m * (lmem[1] / B);
           if(next_in_cycle == lmem[1]) {
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             if(tid == 0) // Dynamic fetch
               lmem[1] = atomicAdd(d_head[0], 1);
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             continue;
           }
           T   data1, data2, data3, data4;
@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
             //make sure the read is not cached
             lmem[0] = atomicAdd(d_finished[lmem[1]], 0);
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
 
           for(; lmem[0] == 0; next_in_cycle = (next_in_cycle * A) - m * (next_in_cycle / B)) {
             T backup1, backup2, backup3, backup4;
@@ -245,11 +245,11 @@ int main(int argc, char **argv) {
             if(i < b)
               backup4 = d_in_out[next_in_cycle * b + i];
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             if(tid == 0) {
               lmem[0] = atomicExch(d_finished[next_in_cycle], (int)1);
             }
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if(!lmem[0]) {
               i = tid;
@@ -281,7 +281,7 @@ int main(int argc, char **argv) {
 
           if(tid == 0) // Dynamic fetch
             lmem[1] = atomicAdd(d_head[0], 1);
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
       });
     });

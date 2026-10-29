@@ -86,10 +86,10 @@ static void split_nearest(sycl::queue &q, int8_t *out_ptr, unsigned ldo,
             amax = sycl::fmax(amax, v);
           }
           lmem[lid] = amax;
-          it.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(it.get_group());
           for (unsigned s = BLOCK / 2; s > 0; s >>= 1) {
             if (lid < s) lmem[lid] = sycl::fmax(lmem[lid], lmem[lid + s]);
-            it.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(it.get_group());
           }
           amax = lmem[0];
 

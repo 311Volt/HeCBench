@@ -69,7 +69,7 @@ void conv1d_tiled(sycl::nd_item<1> &item,
   if (lid < n)
      tile[lid + dim + n] = halo_right >= input_width ? 0 : in[halo_right];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   T s = 0;
   for (int j = 0; j < mask_width; j++)
@@ -93,7 +93,7 @@ void conv1d_tiled_caching(sycl::nd_item<1> &item,
   int i = bid * dim + lid;
   tile[lid] = in[i];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int this_tile_start = bid * dim;
   int next_tile_start = (bid + 1) * dim;

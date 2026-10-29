@@ -66,7 +66,7 @@ void RANSAC_kernel_block(sycl::nd_item<1> &item,
     if(tx == 0) {
       outlier_block_count[0] = 0;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if(model_param[0] == -2011)
       continue;
@@ -92,7 +92,7 @@ void RANSAC_kernel_block(sycl::nd_item<1> &item,
                                sycl::access::address_space::local_space> (outlier_block_count[0]);
     ao.fetch_add(outlier_local_count);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if(tx == 0) {
       // Compare to threshold

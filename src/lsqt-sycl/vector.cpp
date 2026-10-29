@@ -356,7 +356,7 @@ void gpu_find_inner_product_1(
     s_data_real[tid] = (a * c + b * d);
     s_data_imag[tid] = (b * c - a * d);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 /*
   if (tid < 256) {
@@ -364,20 +364,20 @@ void gpu_find_inner_product_1(
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 */
   if (tid < 128) {
     m = tid + 128;
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (tid < 64) {
     m = tid + 64;
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (tid < 32) {
     warp_reduce(s_data_real, tid);
     warp_reduce(s_data_imag, tid);
@@ -485,7 +485,7 @@ void gpu_find_inner_product_2(
       s_data_imag[tid] += g_inner_product_1_imag[m];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 /*
   if (tid < 256) {
@@ -493,20 +493,20 @@ void gpu_find_inner_product_2(
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 */
   if (tid < 128) {
     m = tid + 128;
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (tid < 64) {
     m = tid + 64;
     s_data_real[tid] += s_data_real[m];
     s_data_imag[tid] += s_data_imag[m];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   if (tid < 32) {
     warp_reduce(s_data_real, tid);
     warp_reduce(s_data_imag, tid);

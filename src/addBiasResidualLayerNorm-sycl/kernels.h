@@ -154,7 +154,7 @@ void addBiasResidualPostLayerNormV2(
   if (lid == 0) {
     s_mean = mean / n;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float var      = 0.0f;
   T2    s_mean_2 = floatToType2<T2>(s_mean);
@@ -170,7 +170,7 @@ void addBiasResidualPostLayerNormV2(
   if (lid == 0) {
     s_variance = sycl::rsqrt(variance / n + layernorm_eps);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   T2 s_var_2 = floatToType2<T2>(s_variance);
 #pragma unroll
@@ -218,7 +218,7 @@ void addBiasResidualPostLayerNorm(
   if (lid == 0) {
     s_mean = mean / n;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 #pragma unroll N
   for (int idx = lid, i = 0; idx < n && i < N; ++i) {
@@ -230,7 +230,7 @@ void addBiasResidualPostLayerNorm(
   if (lid == 0) {
     s_variance = variance / n + layernorm_eps;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 #pragma unroll N
   for (int idx = lid, i = 0; idx < n && i < N; ++i) {
@@ -286,7 +286,7 @@ void generalAddBiasResidualPostLayerNorm(
   if (lid == 0) {
     s_mean = mean / n;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int idx = lid; idx < n / 2; idx += dim) {
     int id = bid * n / 2 + idx;
@@ -299,7 +299,7 @@ void generalAddBiasResidualPostLayerNorm(
   if (lid == 0) {
     s_variance = sycl::rsqrt(variance / n + layernorm_eps);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int idx = lid; idx < n / 2; idx += dim) {
     int id = bid * n / 2 + idx;

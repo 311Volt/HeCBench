@@ -193,7 +193,7 @@ void sum_blocks(sycl::nd_item<1> &item,
   flats[lid] = (id < num_sample) ? theta[id] : 0.f;
   logs[lid] = (id < num_sample) ? sycl::log(theta[id]) : 0.f;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int i = wgs / 2;
   while (i != 0) {
@@ -202,7 +202,7 @@ void sum_blocks(sycl::nd_item<1> &item,
       logs[lid] += logs[lid + i];
     }
     i /= 2;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (lid == 0) {

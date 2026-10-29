@@ -254,7 +254,7 @@ void dot_kernel(sycl::nd_item<1> &item, Scalar *red,
       red[lid]=sum;
 #pragma unroll
       for (int n = BLOCK_SIZE / 2; n > 0; n = n/2) {
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         if(lid<n)  {sum+=red[lid+n]; red[lid]=sum;}
       }
 
@@ -269,7 +269,7 @@ void final_reduce(sycl::nd_item<1> &item, Scalar *red, Scalar *d) {
       red[lid]=sum;
 #pragma unroll
       for (int n = BLOCK_SIZE / 2; n > 0; n = n/2) {
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         if(lid<n)  {sum+=red[lid+n]; red[lid]=sum;}
       }
         //save final dot product at the front

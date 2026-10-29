@@ -36,7 +36,7 @@ void moeSoftmax(
       if (item.get_local_id(2) == 0) {
         float_max = maxElem;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       threadData = 0;
 
@@ -50,7 +50,7 @@ void moeSoftmax(
       if (item.get_local_id(2) == 0) {
         normalizing_factor = 1.f / Z;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       for (int ii = item.get_local_id(2); ii < num_cols; ii += TPB) {
         const int idx = thread_row_offset + ii;
@@ -127,13 +127,13 @@ void moeTopK(
         }
 
         smem[tid] = thread_kvp;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for (int stride = TPB / 2; stride > 0; stride /= 2) {
           if (tid < stride) {
               smem[tid] = arg_max(smem[tid], smem[tid + stride]);
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
 
         if (tid == 0) {
@@ -149,7 +149,7 @@ void moeTopK(
           assert(indices[idx] >= 0);
           source_rows[idx] = k_idx * num_tokens + token;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
     };
     cgh.parallel_for(sycl::nd_range<3>(gws, lws), kfn);

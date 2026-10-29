@@ -128,7 +128,7 @@ void kQuantize(const float *__restrict__ code,
 
       LoadFloat(loadf_storage, item).Load(&(A[i]), vals, valid_items);
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       #pragma unroll
       for(int j = 0; j < NUM; j++)

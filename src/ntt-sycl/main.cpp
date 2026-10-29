@@ -28,7 +28,7 @@ void intt_3_64k_modcrt(
 #pragma unroll
   for (int i=0; i<8; i++)
     buffer[tbuf|i] = _ls_modP(samples[i], ((tidx&0x1)<<2)*i*3);
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
 #pragma unroll
   for (int i=0; i<8; i++)

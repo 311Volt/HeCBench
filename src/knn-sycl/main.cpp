@@ -114,7 +114,7 @@ void knn_parallel(float *ref_host, int ref_width, float *query_host,
         }
 
         // Synchronize to make sure the matrices are loaded
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // Compute the difference between the two matrixes; each thread computes one
         // element of the block sub-matrix
@@ -127,7 +127,7 @@ void knn_parallel(float *ref_host, int ref_width, float *query_host,
 
         // Synchronize to make sure that the preceding computation is done before
         // loading two new sub-matrices of A and B in the next iteration
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
 
       // Write the block sub-matrix to device memory; each thread writes one element

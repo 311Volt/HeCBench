@@ -93,7 +93,7 @@ void log_probs_kernel(
     if (tidx == 0) {
       s_max_logit = max_val;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Calculate the denominator: sum_i exp(logits[i])
     float local_sum_exp = 0.0f;

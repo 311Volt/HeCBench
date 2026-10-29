@@ -57,7 +57,7 @@ void sosfilt(
     s_sos[tx * sos_width + i] = sos[tx * sos_width + i];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   const int load_size = n_sections - 1 ;
   const int unload_size = n_samples - load_size ;
@@ -78,11 +78,11 @@ void sosfilt(
 
       s_zi[tx * zi_width + 1] = s_sos[tx * sos_width + 2] * x_n - s_sos[tx * sos_width + 5] * temp;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       s_out[tx] = temp;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     // Processing phase
@@ -97,7 +97,7 @@ void sosfilt(
 
       s_zi[tx * zi_width + 1] = s_sos[tx * sos_width + 2] * x_n - s_sos[tx * sos_width + 5] * temp;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if ( tx < load_size ) {
         s_out[tx] = temp;
@@ -105,7 +105,7 @@ void sosfilt(
         x_in[ty * n_samples + ( n - load_size )] = temp;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     // Unloading phase
@@ -123,7 +123,7 @@ void sosfilt(
         s_zi[tx * zi_width + 1] = s_sos[tx * sos_width + 2] * x_n - s_sos[tx * sos_width + 5] * temp;
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if ( tx > n ) {
         if ( tx < load_size ) {
@@ -133,7 +133,7 @@ void sosfilt(
         }
       }
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 }

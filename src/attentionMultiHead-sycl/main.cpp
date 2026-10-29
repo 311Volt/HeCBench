@@ -53,7 +53,7 @@ void mha (
   // pos is the start position of the corresponding query matrix prococessed by this block.
   int pos = candidate_id * qk_col + head_id * dim_per_head + lid;
   if (lid < dim_per_head) sq[lid] = q[pos];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // calculate the correlation between the query and key QK^T/sqrt(d_k)
 
@@ -75,7 +75,7 @@ void mha (
 
   if (lid == 0)
     s_max_val = max_val;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   local_i -= s_max_val;
 
@@ -86,10 +86,10 @@ void mha (
   float val = (lid < n_steps) ? local_o : 0.f;
   val = sycl::reduce_over_group(g, val, sycl::plus<float>());
   if (lid == 0) s_sum = val;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (lid < n_steps) logits[lid] = local_o / s_sum;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // calculate the weighted sum on value matrix V softmax(QK^T/sqrt(d_k))V 
   summ = 0.f;

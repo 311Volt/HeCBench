@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
 
         /* At this point, the threads must be synchronized to ensure that
            the shared array is fully initialized. */
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         for(int i = idx*4; i < ATTRIBUTES; i+=THREADS*4) {
           sycl::char4 j = ldg((sycl::char4 *)(d_data + i + ATTRIBUTES*gx));
@@ -196,14 +196,14 @@ int main(int argc, char **argv) {
            by thread 0 below, this must be ensured. Above, it was not
            necessary because each thread was accessing its own memory
            */
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         /* Perform balanced tree reduction across the shared memory */
         for (int stride = THREADS/2; stride > 0; stride /= 2) {
           if (idx < stride) {
             dist[idx] += dist[idx + stride];
           }
-          item.barrier(sycl::access::fence_space::local_space);
+          sycl::group_barrier(item.get_group());
         }
 
         if(idx == 0) {

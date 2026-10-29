@@ -47,7 +47,7 @@ void _moe_align_block_size(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   const int tid = item.get_local_id(2);
   const int stride = item.get_local_range(2);
@@ -73,7 +73,7 @@ void _moe_align_block_size(
     ao.fetch_add(mask);
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Compute prefix sum over token counts per expert
 
@@ -97,7 +97,7 @@ void _moe_align_block_size(
     total_tokens_post_pad[model_offset] = cumsum_val;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (item.get_local_id(2) < num_experts) {
     for (int i = cumsum[cumsum_offset + item.get_local_id(2)];
@@ -142,9 +142,9 @@ void _moe_align_block_size_small_batch_expert(
       sorted_token_ids[sorted_token_ids_offset + it] = numel;
     }
     // Three __syncthreads() corresponding to the other threads
-    item.barrier(sycl::access::fence_space::local_space);
-    //item.barrier(sycl::access::fence_space::local_space);
-    //item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
+    //sycl::group_barrier(item.get_group());
+    //sycl::group_barrier(item.get_group());
     return;
   }
 
@@ -169,7 +169,7 @@ void _moe_align_block_size_small_batch_expert(
     tokens_cnts[(tid + 1) * num_experts + expert_id] += mask;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (tid < num_experts) {
     tokens_cnts[tid] = 0;
@@ -179,7 +179,7 @@ void _moe_align_block_size_small_batch_expert(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (tid == 0) {
     cumsum[0] = 0;
@@ -191,7 +191,7 @@ void _moe_align_block_size_small_batch_expert(
         static_cast<int>(cumsum[num_experts]);
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (tid < num_experts) {
     for (int i = cumsum[tid]; i < cumsum[tid + 1]; i += block_size) {

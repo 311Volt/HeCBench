@@ -191,7 +191,7 @@ void selective_scan_vllm_kernel(SSMParamsBase params,
             smem.last_valid_item   = local % kNItems;
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     const int last_thr  = smem.last_valid_thread;
     const int last_item = smem.last_valid_item;
@@ -210,7 +210,7 @@ void selective_scan_vllm_kernel(SSMParamsBase params,
         smem.u_tile[item.get_local_id(2) * kNItems + i] = u_v;
         smem.delta_tile[item.get_local_id(2) * kNItems + i] = dt_v;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Per-state-dimension parallel scan
     float D_val = params.D_ptr[d];
@@ -271,7 +271,7 @@ void selective_scan_vllm_kernel(SSMParamsBase params,
                                                 n * params.B_dstate_stride + l]
                                  : 0.f;
         }
-        item.barrier(sycl::access::fence_space::local_space); // carry_a/b[n] and B/C tiles are ready
+        sycl::group_barrier(item.get_group()); // carry_a/b[n] and B/C tiles are ready
 
         SE carry = { smem.carry_a[n], smem.carry_b[n] };
 
@@ -294,7 +294,7 @@ void selective_scan_vllm_kernel(SSMParamsBase params,
         using ScanOp     = typename Traits::ScanOp;
         SE prefix_out[kNItems];
         BlockScanT(smem.scan_storage, item).InclusiveScan(thread_data, prefix_out, ScanOp{});
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // Incorporate carry and accumulate y
         #pragma unroll
@@ -331,7 +331,7 @@ void selective_scan_vllm_kernel(SSMParamsBase params,
             smem.carry_a[n] = combined.a;
             smem.carry_b[n] = combined.b;
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
     }
     // After the n-loop, smem.carry_{a,b}[n] holds the end-of-chunk hidden
     // state for every n, written by last_thr and visible to all threads.

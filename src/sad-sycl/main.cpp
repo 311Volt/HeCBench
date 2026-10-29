@@ -10,7 +10,7 @@
 #define THRESHOLD     20
 #define FOUND_MIN     5000
 #define min(a, b) ((a) < (b) ? (a) : (b))
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define syncthreads() sycl::group_barrier(item.get_group())
 
 void compute_sad_array(
     sycl::nd_item<2> &item,

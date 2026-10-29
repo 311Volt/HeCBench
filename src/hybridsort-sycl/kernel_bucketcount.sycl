@@ -10,7 +10,7 @@ const int numThreads = gsize;
 for (int i = lid; i < BUCKET_BLOCK_MEMORY; i += lsize)
   s_offset[i] = 0;
 
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 for (int tid = gid; tid < listsize; tid += numThreads) {
   float elem = input_acc[tid];
@@ -30,7 +30,7 @@ for (int tid = gid; tid < listsize; tid += numThreads) {
     (atomicAdd(s_offset[warpBase+idx], 1U) << LOG_DIVISIONS)  + idx;
 }
 
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 int prefixBase = item.get_group(0) * BUCKET_BLOCK_MEMORY;
 

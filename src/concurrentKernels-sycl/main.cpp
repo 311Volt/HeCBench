@@ -51,13 +51,13 @@ void sum(long *d_clocks, int N, sycl::nd_item<1> &item, long *s_clocks) {
 
   s_clocks[lid] = my_sum;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int i = 16; i > 0; i /= 2) {
     if (lid < i) {
       s_clocks[lid] += s_clocks[lid + i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   d_clocks[0] = s_clocks[0];

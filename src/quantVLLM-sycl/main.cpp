@@ -68,7 +68,7 @@ void dynamic_scaled_int8_quant_kernel(
     block_absmax_val = block_absmax_val_maybe;
     scale[token_idx] = block_absmax_val / 127.0f;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float const tmp_scale = 127.0f / block_absmax_val;
   for (int i = tid; i < hidden_size; i += item.get_local_range(2)) {
@@ -115,7 +115,7 @@ void dynamic_scaled_int8_azp_quant_kernel(
   }
 
   // Wait for the scale and azp to be computed
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   float const scale_val = scale_sh;
   azp_type const azp_val = azp_sh;

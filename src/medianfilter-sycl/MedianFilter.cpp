@@ -138,7 +138,7 @@ void ckMedian(
   }
 
   // Synchronize the read into LMEM
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Compute
   // reset accumulators

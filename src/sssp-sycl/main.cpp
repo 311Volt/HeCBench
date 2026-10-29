@@ -219,7 +219,7 @@ void SSSP_gpu(
     *base = atomicAdd(head, WG_SIZE);
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   int my_base = *base;
   while(my_base < n_t_local) {
@@ -230,7 +230,7 @@ void SSSP_gpu(
         // Add local tail_bin to tail
         *shift = atomicAdd(tail, tail_bin);
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       int local_shift = tid;
       while(local_shift < tail_bin) {
@@ -238,15 +238,15 @@ void SSSP_gpu(
         // Multiple threads are copying elements at the same time, so we shift by multiple elements for next iteration
         local_shift += WG_SIZE;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if(tid == 0) {
         // Reset local queue
         tail_bin = 0;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
-    item.barrier(sycl::access::fence_space::local_space); // l_q2 read complete
+    sycl::group_barrier(item.get_group()); // l_q2 read complete
 
     if(my_base + tid < n_t_local && *overflow == 0) {
       // Visit a node from the current frontier
@@ -283,7 +283,7 @@ void SSSP_gpu(
     if(tid == 0) {
       *base = atomicAdd(head, WG_SIZE); // Fetch more frontier elements from the queue
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     my_base = *base;
   }
@@ -292,7 +292,7 @@ void SSSP_gpu(
   if(tid == 0) {
     *shift = atomicAdd(tail, tail_bin);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   ///////////////////// CONCATENATE INTO GLOBAL MEMORY /////////////////////
   int local_shift = tid;

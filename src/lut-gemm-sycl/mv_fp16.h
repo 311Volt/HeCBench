@@ -104,7 +104,7 @@ void _nqmv(uint32_t *W, sycl::half *alpha, sycl::half *input,
             lut[lut_y][i + lut_x] =  lut[lut_y][i +  lut_x - (1 << s)] + iValue;
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int m_start =
         item.get_group(2) * M_TILE_SIZE + item.get_local_id(2) * 2;
@@ -252,7 +252,7 @@ void _nqmv_bias(uint32_t *W, sycl::half *alpha, sycl::half *q_bias,
             lut[lut_y][i + lut_x] =  lut[lut_y][i +  lut_x - (1 << s)] + iValue;
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int m_start =
         item.get_group(2) * M_TILE_SIZE + item.get_local_id(2) * 2;

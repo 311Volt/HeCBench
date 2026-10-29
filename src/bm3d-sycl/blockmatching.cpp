@@ -131,7 +131,7 @@ void block_matching(
     s_image_p[i] = image[idx2(p_rectangle_start+sx,p.y()+sy,image_dim.x())];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //scale difference so that it can fit ushort
   uint shift = (sycl::clz(params.Tn) < 16u) ? 16u - (uint)sycl::clz(params.Tn) : 0;
@@ -202,7 +202,7 @@ void block_matching(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   uint batch_size = gridx*warpSize;
   uint block_address_x = bidx*warpSize+tid;

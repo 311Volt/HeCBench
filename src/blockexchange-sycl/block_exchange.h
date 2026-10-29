@@ -246,7 +246,7 @@ private:
             uninitialized_copy(temp_storage.buff + item_offset, input_items[ITEM]);
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         #pragma unroll
         for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -282,7 +282,7 @@ private:
             const int SLICE_OFFSET  = SLICE * TIME_SLICED_ITEMS;
             const int SLICE_OOB     = SLICE_OFFSET + TIME_SLICED_ITEMS;
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if (warp_id == SLICE)
             {
@@ -295,7 +295,7 @@ private:
                 }
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             #pragma unroll
             for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -400,7 +400,7 @@ private:
         #pragma unroll
         for (unsigned int SLICE = 1; SLICE < TIME_SLICES; ++SLICE)
         {
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if (warp_id == SLICE)
             {
@@ -450,7 +450,7 @@ private:
             uninitialized_copy(temp_storage.buff + item_offset, input_items[ITEM]);
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // No timeslicing
         #pragma unroll
@@ -488,7 +488,7 @@ private:
             const int SLICE_OFFSET  = SLICE * TIME_SLICED_ITEMS;
             const int SLICE_OOB     = SLICE_OFFSET + TIME_SLICED_ITEMS;
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             #pragma unroll
             for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -508,7 +508,7 @@ private:
                 }
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if (warp_id == SLICE)
             {
@@ -586,7 +586,7 @@ private:
         #pragma unroll
         for (unsigned int SLICE = 0; SLICE < TIME_SLICES; ++SLICE)
         {
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if (warp_id == SLICE)
             {
@@ -638,7 +638,7 @@ private:
             uninitialized_copy(temp_storage.buff + item_offset, input_items[ITEM]);
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         #pragma unroll
         for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -671,7 +671,7 @@ private:
         #pragma unroll
         for (int SLICE = 0; SLICE < TIME_SLICES; SLICE++)
         {
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             const int SLICE_OFFSET = TIME_SLICED_ITEMS * SLICE;
 
@@ -686,7 +686,7 @@ private:
                 }
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
             if (warp_id == SLICE)
             {
@@ -735,7 +735,7 @@ private:
             uninitialized_copy(temp_storage.buff + item_offset, input_items[ITEM]);
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
 #pragma unroll
         for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -773,7 +773,7 @@ private:
             const int SLICE_OFFSET  = SLICE * TIME_SLICED_ITEMS;
             const int SLICE_OOB     = SLICE_OFFSET + TIME_SLICED_ITEMS;
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
 #pragma unroll
             for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -786,7 +786,7 @@ private:
                 }
             }
 
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
 
 #pragma unroll
             for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -1170,7 +1170,7 @@ public:
                 temp_storage.buff[item_offset] = input_items[ITEM];
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
 #pragma unroll
         for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)
@@ -1217,7 +1217,7 @@ public:
                 temp_storage.buff[item_offset] = input_items[ITEM];
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
 #pragma unroll
         for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ITEM++)

@@ -12,7 +12,7 @@
 
 typedef unsigned int uint32_t;
 
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 void LFIB4(uint32_t n, uint32_t *x) {
   #pragma omp simd safelen(32)

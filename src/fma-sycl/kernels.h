@@ -69,7 +69,7 @@ void implicit_fma_kernel(const T* __restrict__ a,
   for (int i = tid; i < C; i += threads_per_block) {
     shared_b[i] = b[i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Calculate global thread index
   int idx = item.get_global_id(2);
@@ -138,7 +138,7 @@ void implicit_fma_kernel<float>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Modified thread mapping: each thread processes 4 consecutive channels
   int total_vec4_threads = num_ops * C_vec4;
@@ -258,7 +258,7 @@ void implicit_fma_kernel<sycl::half>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Modified thread mapping: each thread processes 8 consecutive channels
   int total_vec8_threads = num_ops * C_vec8;
@@ -384,7 +384,7 @@ void implicit_fma_kernel<sycl::ext::oneapi::bfloat16>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Modified thread mapping: each thread processes 8 consecutive channels
   int total_vec8_threads = num_ops * C_vec8;
@@ -494,7 +494,7 @@ void implicit_fma_kernel_rowwise(const T* __restrict__ a,
   for (int i = tid; i < C; i += threads_per_block) {
     shared_b[i] = b[i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Each thread processes one operation (one row)
   int op_idx = item.get_group(2) * item.get_local_range(2) +
@@ -560,7 +560,7 @@ void implicit_fma_kernel_rowwise<float>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Each thread processes one operation (one row)
   int op_idx = item.get_global_id(2);
@@ -663,7 +663,7 @@ void implicit_fma_kernel_rowwise<sycl::half>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Each thread processes one operation (one row)
   int op_idx = item.get_global_id(2);
@@ -772,7 +772,7 @@ void implicit_fma_kernel_rowwise<sycl::ext::oneapi::bfloat16>(
   for (int i = tid; i < C_remainder; i += threads_per_block) {
     shared_b[start_remainder + i] = b[start_remainder + i];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Each thread processes one operation (one row)
   int op_idx = item.get_global_id(2);

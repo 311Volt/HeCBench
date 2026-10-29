@@ -4,7 +4,7 @@
 #include <chrono>
 #include <sycl/sycl.hpp>
 
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define syncthreads() sycl::group_barrier(item.get_group())
 #define threadfence() sycl::atomic_fence(sycl::memory_order::acq_rel,\
                                          sycl::memory_scope::device)
 

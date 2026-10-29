@@ -133,7 +133,7 @@ void AIDW_Kernel_Tiled(
       sdy[lid] = dy[lid + BLOCK_SIZE * m];
       sdz[lid] = dz[lid + BLOCK_SIZE * m];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for(e = 0; e < BLOCK_SIZE; e++) {
       six_s = six_t - sdx[e];
@@ -141,7 +141,7 @@ void AIDW_Kernel_Tiled(
       dist = (six_s * six_s + siy_s * siy_s);
       t = 1.f / (sycl::pow(dist, alpha));  sum_dn += t;  sum_up += t * sdz[e];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
   iz[tid] = sum_up / sum_dn;
 }

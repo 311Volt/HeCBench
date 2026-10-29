@@ -16,7 +16,7 @@ void dense_input(
         shRow[item.get_local_id(2)] = bias[item.get_local_id(2)];
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = item.get_local_id(1); i < N; i += item.get_local_range(1)) {
         float valY = Y0[item.get_group(2) * N + i];
         if(valY == 0) {
@@ -25,7 +25,7 @@ void dense_input(
         float valW = weight[i * K + item.get_local_id(2)];
         atomicAdd(shRow[item.get_local_id(2)], valY * valW);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (item.get_local_id(1) == 0) {
         Y1[item.get_group(2) * K + item.get_local_id(2)] =
             sycl::min(float(1.0), (float)(sycl::max(float(0), (float)(shRow[item.get_local_id(2)]))));
@@ -50,7 +50,7 @@ void sparse_hidden(
     if (tid < K) {
         shRow[tid] = bias[tid]; 
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int i = item.get_local_id(1); i < N;
          i += item.get_local_range(1)) {
@@ -67,7 +67,7 @@ void sparse_hidden(
             atomicAdd(shRow[colW], valY * valW);
         }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (tid < K) {
         Y1[item.get_group(2) * K + tid] =
             sycl::min(float(1.0), sycl::max(float(0), shRow[tid]));
@@ -87,7 +87,7 @@ void dense_output(
         shRow[item.get_local_id(2)] = bias[item.get_local_id(2)];
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = item.get_local_id(1); i < N;
          i += item.get_local_range(1)) {
         float valY = Y0[item.get_group(2) * N + i];
@@ -97,7 +97,7 @@ void dense_output(
         float valW = weight[i * K + item.get_local_id(2)];
         atomicAdd(shRow[item.get_local_id(2)], valY * valW);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (item.get_local_id(1) == 0) {
         Y1[item.get_group(2) * K + item.get_local_id(2)] =
             shRow[item.get_local_id(2)];
@@ -110,7 +110,7 @@ void check_acc(
     auto shcnt = (int *)dpct_local;
     if (item.get_local_id(2) == 0)
         shcnt[0] = 0;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int i = item.get_local_id(2); i < num_input;
          i += item.get_local_range(2)) {
         int argmax = 0;
@@ -126,7 +126,7 @@ void check_acc(
             atomicAdd(shcnt[0], 1);
     }
     // printf("shcnt[0]=%d", shcnt[0]);
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (item.get_local_id(2) == 0) 
        cnt[0] = shcnt[0];
 }

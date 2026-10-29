@@ -24,20 +24,20 @@ for(i = 0; i < maxheight; i++){
       offset_2D_acc[bid] = knodesD_acc[lastKnodeD_acc[bid]].indices[thid];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   // set for next tree level
   if(thid==0){
     currKnodeD_acc[bid] = offsetD_acc[bid];
     lastKnodeD_acc[bid] = offset_2D_acc[bid];
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 }
 
 // Find the index of the starting record
 if(knodesD_acc[currKnodeD_acc[bid]].keys[thid] == startD_acc[bid]){
   RecstartD_acc[bid] = knodesD_acc[currKnodeD_acc[bid]].indices[thid];
 }
-item.barrier(sycl::access::fence_space::local_space);
+sycl::group_barrier(item.get_group());
 
 // Find the index of the ending record
 if(knodesD_acc[lastKnodeD_acc[bid]].keys[thid] == endD_acc[bid]){

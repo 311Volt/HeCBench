@@ -54,7 +54,7 @@ if(bx<dim_cpu_number_boxes) {
 
   // (enable the section below only if wanting to use shared memory)
   // synchronize threads  - not needed, but just to be safe for now
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //  nei box loop
 
@@ -86,7 +86,7 @@ if(bx<dim_cpu_number_boxes) {
 
     // (enable the section below only if wanting to use shared memory)
     // synchronize threads because in next section each thread accesses data brought in by different threads here
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //  Calculation
 
@@ -128,7 +128,7 @@ if(bx<dim_cpu_number_boxes) {
     wtx = tx;
 
     // synchronize after finishing force contributions from current nei box not to cause conflicts when starting next box
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //  Calculation END
   }

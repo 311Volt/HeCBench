@@ -44,9 +44,9 @@ inline uint scan1Inclusive(sycl::nd_item<1> &item, const uint idata,
   l_Data[pos] = idata;
 
   for(uint offset = 1; offset < size; offset <<= 1){
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     uint t = l_Data[pos] + l_Data[pos - offset];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     l_Data[pos] = t;
   }
 
@@ -94,14 +94,14 @@ inline uint scan1Inclusive(sycl::nd_item<1> &item, const uint idata,
 
     //Save top elements of each warp for exclusive warp scan
     //sync to wait for warp scans to complete (because l_Data is being overwritten)
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int lid = item.get_local_id(0);
     if( (lid & (WARP_SIZE - 1)) == (WARP_SIZE - 1) )
       l_Data[lid >> LOG2_WARP_SIZE] = warpResult;
 
     //wait for warp scans to complete
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if( lid < (WORKGROUP_SIZE / WARP_SIZE) ){
       //grab top warp elements
       uint val = l_Data[lid] ;
@@ -110,7 +110,7 @@ inline uint scan1Inclusive(sycl::nd_item<1> &item, const uint idata,
     }
 
     //return updated warp scans with exclusive scan results
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     return warpResult + l_Data[lid >> LOG2_WARP_SIZE];
   }else{
     return warpScanInclusive(item, idata, l_Data, size);
@@ -211,7 +211,7 @@ void uniformUpdateK(
     if(item.get_local_id(0) == 0)
       buf = d_Buf[item.get_group(0)];
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     data4 += (uint4)buf;
 
     //d_Data[i] = data4;

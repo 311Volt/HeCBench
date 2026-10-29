@@ -30,7 +30,7 @@ inline float blockReduceSum(sycl::nd_item<2> &item, T* shared, T val, int tid, i
 
   if (lane==0) shared[wid]=val; // Write reduced value to shared memory
 
-  item.barrier(sycl::access::fence_space::local_space);              // Wait for all partial reductions
+  sycl::group_barrier(item.get_group());              // Wait for all partial reductions
 
   //read from shared memory only if that warp existed
   val = (tid < tcount / warpSize) ? shared[lane] : 0;
@@ -225,7 +225,7 @@ void hard_treshold_block(
   }
   
   //Reuse the shared memory for 32 partial sums
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   uint* shared = (uint*)data;
   //Sum the number of non-zero coefficients for a 3D group
   nonzero = blockReduceSum<uint>(item, shared, nonzero, tid, tcount);

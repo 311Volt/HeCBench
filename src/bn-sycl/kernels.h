@@ -141,7 +141,7 @@ void computeKernel(const int taskperthr,
 
   lsinblock[tid]=bestls;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for(i=128;i>=1;i/=2){
 
@@ -161,7 +161,7 @@ void computeKernel(const int taskperthr,
         lsinblock[tid+i]=(float)tid;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if(tid==0){
@@ -173,7 +173,7 @@ void computeKernel(const int taskperthr,
     lsinblock[0]=(float)t;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(tid==(int)lsinblock[0]){
     for(i=0;i<4;i++){

@@ -1161,7 +1161,7 @@ long benchmark(
             // Process all CHUNK_SIZE matrices: two matrices are processed at once (therefore increment 2)
             for (int m = start; m < stop; m += 2)
             {
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
               if (ij < (DIM * DIM)) 
               { // Load input sigma matrix into local memory: only threads with valid IDs participate
                 s1 = d_sigma_in[sigma_id(i, j, m)]; // Real and imaginary part of matrix 'm', element (i,j)
@@ -1180,7 +1180,7 @@ long benchmark(
                 snew1_ij.y() = s2.x();
                 snew2_ij.y() = s2.y();
               }
-              item.barrier(sycl::access::fence_space::local_space);
+              sycl::group_barrier(item.get_group());
 
               if (ij < (DIM * DIM))
               {

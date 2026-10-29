@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
         if ( i < Lx && j < Ly )
           s_Img[stid] = d_img[gtid];
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if ( i < Lx && j < Ly )
         {
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
         if ( i < Lx && j < Ly )
           s_Img[stid] = d_img[gtid];
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if ( i < Lx && j < Ly )
         {

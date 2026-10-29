@@ -180,7 +180,7 @@ void kern_block_sort(
         tmem[(warp_id<<7)+(warp_lane<<2)+1 ] = rg_v1 ;
         tmem[(warp_id<<7)+(warp_lane<<2)+2 ] = rg_v2 ;
         tmem[(warp_id<<7)+(warp_lane<<2)+3 ] = rg_v3 ;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Merge in 4 steps
         int grp_start_wp_id;
         int grp_start_off;
@@ -256,7 +256,7 @@ void kern_block_sort(
         p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
         rg_k3 = p ? tmp_k0 : tmp_k1;
         rg_v3 = p ? tmp_v0 : tmp_v1;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
 
         smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -267,7 +267,7 @@ void kern_block_sort(
         tmem[grp_start_off+gran+1 ] = rg_v1 ;
         tmem[grp_start_off+gran+2 ] = rg_v2 ;
         tmem[grp_start_off+gran+3 ] = rg_v3 ;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 1
         grp_start_wp_id = ((warp_id>>2)<<2);
         grp_start_off = (grp_start_wp_id)*128;
@@ -323,7 +323,7 @@ void kern_block_sort(
         p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
         rg_k3 = p ? tmp_k0 : tmp_k1;
         rg_v3 = p ? tmp_v0 : tmp_v1;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
 
         smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -334,7 +334,7 @@ void kern_block_sort(
         tmem[grp_start_off+gran+1 ] = rg_v1 ;
         tmem[grp_start_off+gran+2 ] = rg_v2 ;
         tmem[grp_start_off+gran+3 ] = rg_v3 ;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 2
         grp_start_wp_id = ((warp_id>>3)<<3);
         grp_start_off = (grp_start_wp_id)*128;
@@ -390,7 +390,7 @@ void kern_block_sort(
         p = (s_b>=lhs_len+rhs_len)||((s_a<lhs_len)&&(tmp_k0<=tmp_k1));
         rg_k3 = p ? tmp_k0 : tmp_k1;
         rg_v3 = p ? tmp_v0 : tmp_v1;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Store merged results back to shared memory
 
         smem[grp_start_off+gran+0 ] = rg_k0 ;
@@ -401,7 +401,7 @@ void kern_block_sort(
         tmem[grp_start_off+gran+1 ] = rg_v1 ;
         tmem[grp_start_off+gran+2 ] = rg_v2 ;
         tmem[grp_start_off+gran+3 ] = rg_v3 ;
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
         // Step 3
         grp_start_wp_id = ((warp_id>>4)<<4);
         grp_start_off = (grp_start_wp_id)*128;
@@ -552,7 +552,7 @@ SYCL_EXTERNAL void kern_block_merge(const K *keys, const T *vals, K *keysB,
         if(l_s_b+tid+1664<r_s_b) smem[r_st+tid+1664] = keys[k+loc_b+l_s_b+tid+1664];
         if(l_s_b+tid+1792<r_s_b) smem[r_st+tid+1792] = keys[k+loc_b+l_s_b+tid+1792];
         if(l_s_b+tid+1920<r_s_b) smem[r_st+tid+1920] = keys[k+loc_b+l_s_b+tid+1920];
-        item_ct1.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item_ct1.get_group());
 
         int gran = tid<<4;
         int s_a, s_b;

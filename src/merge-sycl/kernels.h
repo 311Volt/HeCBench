@@ -50,7 +50,7 @@ vec_t getNegativeInfinity() {
 
 #define MAX(X,Y) (((X) > (Y)) ? (X) : (Y))
 #define MIN(X,Y) (((X) < (Y)) ? (X) : (Y))
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space);
+#define syncthreads() sycl::group_barrier(item.get_group());
 
 /*
  * Performs a 32-wide binary search on one global diagonal per block to find the intersection with the path.

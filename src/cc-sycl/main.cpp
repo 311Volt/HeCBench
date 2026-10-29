@@ -270,11 +270,11 @@ void compute3(sycl::nd_item<1> &item,
     const int idx = atomicAdd(posH, -1);
     vB = (idx > *topH) ? wl[idx] : -1;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while (vB >= 0) {
     const int v = (vB);
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int vstat = representative(v, nstat);
     for (int i = nidx[v] + item.get_local_id(0); i < nidx[v + 1];
@@ -307,7 +307,7 @@ void compute3(sycl::nd_item<1> &item,
       vB = (idx > *topH) ? wl[idx] : -1;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 

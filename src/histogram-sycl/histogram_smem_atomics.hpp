@@ -69,7 +69,7 @@ double run_smem_atomics(
         // initialize smem
         for (int i = t; i < ACTIVE_CHANNELS * NUM_BINS + 3; i += nt)
             smem[i] = 0;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // process pixels
         // updates our group's partial histogram in smem
@@ -93,7 +93,7 @@ double run_smem_atomics(
             }
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // store local output to global
         for (int i = t; i < NUM_BINS; i += nt)

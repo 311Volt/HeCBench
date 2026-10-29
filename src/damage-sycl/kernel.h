@@ -27,14 +27,14 @@ void damage_of_node(
     local_cache[local_id] = 0;
 
   //Wait for all threads
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int i = local_size/2; i > 0; i /= 2) {
     if(local_id < i){
       local_cache[local_id] += local_cache[local_id + i];
     }
     //Wait for all threads
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if (local_id == 0) {

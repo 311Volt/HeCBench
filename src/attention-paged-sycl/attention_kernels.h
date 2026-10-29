@@ -51,7 +51,7 @@ inline float block_sum(float* red_smem, float sum, sycl::nd_item<3> &item) {
   }
 
   // Make sure the data is in shared memory.
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // The warps compute the final sums.
   if (lane < NUM_WARPS) {
@@ -183,7 +183,7 @@ void paged_attention_kernel(
         *reinterpret_cast<const Q_vec*>(q_ptr + vec_idx * VEC_SIZE);
   }
    // TODO(naed90): possible speedup if this is replaced with a memory wall right before we use q_vecs
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Memory planning.
   // NOTE(woosuk): We use FP32 for the softmax logits for better accuracy.
@@ -298,7 +298,7 @@ void paged_attention_kernel(
   if (lane == 0) {
     red_smem[warp_idx] = qk_max;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // TODO(woosuk): Refactor this part.
   // Get the max qk value for the sequence.
@@ -324,7 +324,7 @@ void paged_attention_kernel(
   for (int i = thread_idx; i < num_tokens; i += NUM_THREADS) {
     logits[i] *= inv_sum;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // If partitioning is enabled, store the max logit and exp_sum.
   if (USE_PARTITIONING && thread_idx == 0) {
@@ -417,7 +417,7 @@ void paged_attention_kernel(
 
   // NOTE(woosuk): A barrier is required because the shared memory space for
   // logits is reused for the output.
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Perform reduction across warps.
   float* out_smem = reinterpret_cast<float*>(shared_mem);
@@ -435,7 +435,7 @@ void paged_attention_kernel(
         }
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Lower warps update the output.
     if (warp_idx < mid) {
@@ -448,7 +448,7 @@ void paged_attention_kernel(
         }
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   // Write the final output.

@@ -66,7 +66,7 @@ void bit_rev_permutation(fr_t* d_out, const fr_t *d_in, uint32_t lg_domain_size,
 
         fr_t t = d_in[idx];
         if (d_out == d_in)
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
         d_out[rev] = t;
     } else {
         index_t idx = 

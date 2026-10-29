@@ -132,7 +132,7 @@ void constants_kernel(
     matrix[i] = clusters_R[bid*num_dimensions*num_dimensions+i];
   }
 
-  item.barrier(sycl::access::fence_space::local_space); 
+  sycl::group_barrier(item.get_group()); 
 
   if(tid == 0) { 
 #if DIAG_ONLY
@@ -146,7 +146,7 @@ void constants_kernel(
   invert(matrix,num_dimensions,determinant_arg);
 #endif
   }
-  item.barrier(sycl::access::fence_space::local_space); 
+  sycl::group_barrier(item.get_group()); 
   log_determinant = determinant_arg;
 
   // Copy the matrx from shared memory back into the cluster memory
@@ -154,7 +154,7 @@ void constants_kernel(
     clusters_Rinv[bid*num_dimensions*num_dimensions+i] = matrix[i];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Compute the constant
   // Equivilent to: log(1/((2*PI)^(M/2)*det(R)^(1/2)))
@@ -163,7 +163,7 @@ void constants_kernel(
     clusters_constant[bid] = -num_dimensions*0.5f*sycl::log(2.0f*PI) - 0.5f*log_determinant;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(bid == 0) {
     // compute_pi(clusters,num_clusters);
@@ -175,7 +175,7 @@ void constants_kernel(
       }
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for(int i = tid; i < num_clusters; i += num_threads) {
       if(clusters_N[i] < 0.5f) {
@@ -246,7 +246,7 @@ void estep1_kernel(
   float constant = clusters_constant[c];
 
   // Sync to wait for all params to be loaded to shared memory
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for(int event=start_index; event<end_index; event += NUM_THREADS_ESTEP) {
     float like = 0.0f;
@@ -336,14 +336,14 @@ void estep2_kernel(
   }
 
   total_likelihoods[tid] = thread_likelihood;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // temp = parallelSum(total_likelihoods,NUM_THREADS_ESTEP);
   for (unsigned int bit = NUM_THREADS_ESTEP >> 1; bit > 0; bit >>= 1) {
     float t = total_likelihoods[tid] + total_likelihoods[tid^bit];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     total_likelihoods[tid] = t;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if(tid == 0) {

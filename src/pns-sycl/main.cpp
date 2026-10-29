@@ -41,7 +41,7 @@ T(r+3,c-1)-> P(r+3,c) -> T(r+3,c)->
 
 */
 
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 #include "rand_gen.cpp"
 #include "petri_kernel.cpp"
 

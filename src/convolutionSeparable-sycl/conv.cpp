@@ -78,7 +78,7 @@ void convolutionRows(
             l_Data[lidY][lidX + i * ROWS_BLOCKDIM_X] = (baseX + i * ROWS_BLOCKDIM_X < imageW) ? ldg(&src_new[i * ROWS_BLOCKDIM_X]) : 0;
 
         //Compute and store results
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         #pragma unroll
         for(int i = ROWS_HALO_STEPS; i < ROWS_HALO_STEPS + ROWS_RESULT_STEPS; i++) {
@@ -145,7 +145,7 @@ void convolutionColumns(
             l_Data[lidX][lidY + i * COLUMNS_BLOCKDIM_Y] = (baseY + i * COLUMNS_BLOCKDIM_Y < imageH) ? ldg(&src_new[i * COLUMNS_BLOCKDIM_Y * pitch]) : 0;
 
         //Compute and store results
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         #pragma unroll
         for(int i = COLUMNS_HALO_STEPS; i < COLUMNS_HALO_STEPS + COLUMNS_RESULT_STEPS; i++) {

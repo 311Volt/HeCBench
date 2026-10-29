@@ -1,4 +1,4 @@
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 static inline void atomicAdd(int& val, const int delta)
 {

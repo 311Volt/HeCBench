@@ -35,14 +35,14 @@ void scatterAdd_kernel(
       output_buffer[idx] = 0;
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for (int idx_start = 0; idx_start < WORK_SIZE; idx_start = idx_start + MAX_THREADS_PER_BLOCK) {
     int batch_idx = batch_idx_start + idx_start + thread_idx;
     if (batch_idx < batch_size) {
       index_buffer[thread_idx] = indexes[batch_idx];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     for (int buffer_idx_start = 0; buffer_idx_start < MAX_THREADS_PER_BLOCK;
          buffer_idx_start = buffer_idx_start + MAX_THREADS_PER_BLOCK / warpSize) {
       int buffer_idx = buffer_idx_start + item.get_local_id(1);
@@ -58,7 +58,7 @@ void scatterAdd_kernel(
         }
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   for (int idx_start = 0; idx_start < output_size * vector_dim;
@@ -99,7 +99,7 @@ void scatterAdd2_kernel(
     if (batch_idx < batch_size) {
       index_buffer[thread_idx] = indexes[batch_idx];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     for (int buffer_idx_start = 0; buffer_idx_start < MAX_THREADS_PER_BLOCK;
          buffer_idx_start = buffer_idx_start + MAX_THREADS_PER_BLOCK / warpSize) {
@@ -113,7 +113,7 @@ void scatterAdd2_kernel(
         }
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   for (int idx = thread_idx; idx < output_size * vector_dim; idx += MAX_THREADS_PER_BLOCK) {

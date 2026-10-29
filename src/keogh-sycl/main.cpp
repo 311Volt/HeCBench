@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
             cache[k] = d_subject[blockSize + k];
           }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if (idx < N-M+1) {
 

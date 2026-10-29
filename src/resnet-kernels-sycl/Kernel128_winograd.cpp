@@ -7,7 +7,7 @@ const char bnBias_winograd_Name128[] = "data/bnBias_winograd_128.bin";
 const char bnScale_winograd_Name128[] = "data/bnScale_winograd_128.bin";
 
 #define d(input, i, j, Inz) ( input[Inz + i*768 + (j<<7)] )
-#define __syncthreads() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthreads() sycl::group_barrier(item.get_group())
 
 void kernel_128_winograd_BtdB(
   sycl::nd_item<2> &item,

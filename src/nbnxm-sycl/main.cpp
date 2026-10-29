@@ -80,7 +80,7 @@ static __attribute__((always_inline))
       sm_buf[tidx]                 = fCiBufX[ciOffset];
       sm_buf[bufStride + tidx]     = fCiBufY[ciOffset];
       sm_buf[2 * bufStride + tidx] = fCiBufZ[ciOffset];
-      itemIdx.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(itemIdx.get_group());
 
       /* Reduce the initial c_clSize values for each i atom to half
        * every step by using c_clSize * i threads. */
@@ -94,7 +94,7 @@ static __attribute__((always_inline))
           sm_buf[2 * bufStride + tidx] += sm_buf[2 * bufStride + tidx + i * c_clSize];
         }
         i >>= 1;
-        itemIdx.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(itemIdx.get_group());
       }
 
       /* i == 1, last reduction step, writing to global mem */
@@ -112,7 +112,7 @@ static __attribute__((always_inline))
           fShiftBuf += f;
         }
       }
-      itemIdx.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(itemIdx.get_group());
     }
     /* add up local shift forces into global mem */
     if (calcFShift)
@@ -265,7 +265,7 @@ auto nbnxmKernelTest(
 
       sm_atomTypeI[(tidxj + i) * c_clSize + tidxi] = a_atomTypes[ai];
     }
-    itemIdx.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(itemIdx.get_group());
 
     // Only needed if (doExclusionForces)
     const bool nonSelfInteraction = !(nbScishift == c_centralShiftIndex & tidxj <= tidxi);

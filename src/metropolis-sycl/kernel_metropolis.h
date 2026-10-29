@@ -147,7 +147,7 @@ kernel_metropolis(const int N, const int L, site_t *s, const int *H,
   float dh;
   int c;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   for(int i = 0; i < BLOCK_STEPS; ++i){
 
@@ -160,7 +160,7 @@ kernel_metropolis(const int N, const int L, site_t *s, const int *H,
         sycl::signbit(gpu_rand01(&lstate, &linc) - sycl::exp(dh * B));
     ss[sC(sx, wy, sz, sLx, sLy)] *= (1 - 2*c);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     /* -------- black update -------- */
     dh = (float)(ss[sC(sx, by, sz, sLx, sLy)] * (
@@ -172,7 +172,7 @@ kernel_metropolis(const int N, const int L, site_t *s, const int *H,
         sycl::signbit(gpu_rand01(&lstate, &linc) - sycl::exp(dh * B));
     ss[sC(sx, by, sz, sLx, sLy)] *= (1 - 2*c);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   /* copy data back to gmem */

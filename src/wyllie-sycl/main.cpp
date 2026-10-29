@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
             long temp = (node & MASK) ;
             temp += (next & MASK) ;
             temp += (next >> 32) << 32;
-            item.barrier(sycl::access::fence_space::local_space);
+            sycl::group_barrier(item.get_group());
             d_list [index] = temp ;
           }
         }

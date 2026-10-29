@@ -143,13 +143,13 @@ T device_dot_product(sycl::queue &q, const int n, T *x, T *y, T *z) {
       else 
         result[lid] = 0;
 
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       int half = THREADS_PER_BLOCK / 2;
       while (half > 0) {
         if (lid < half) 
           result[lid] += result[lid + half];
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
         half /= 2;
       }
       if (lid == 0) z[bid] = result[0];

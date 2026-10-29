@@ -58,12 +58,12 @@ void cyclic_small_systems_kernel(
   d[thid] = d_d[thid + blid * system_size];
   d[thid + thid_num] = d_d[thid + thid_num + blid * system_size];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // forward elimination
   for (int j = 0; j < iterations; j++)
   {
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     stride <<= 1;
     int delta = stride >> 1;
@@ -120,7 +120,7 @@ void cyclic_small_systems_kernel(
   for (int j = 0; j < iterations; j++)
   {
     int delta = stride >> 1;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (thid < thid_num)
     {
       int i = stride * thid + (stride >> 1) - 1;
@@ -140,7 +140,7 @@ void cyclic_small_systems_kernel(
     thid_num <<= 1;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);   
+  sycl::group_barrier(item.get_group());   
 
   x_d[thid + blid * system_size] = x[thid];
   x_d[thid + half_size + blid * system_size] = x[thid + half_size];
@@ -183,12 +183,12 @@ void cyclic_branch_free_kernel(
   d[thid] = d_d[thid + blid * system_size];
   d[thid + thid_num] = d_d[thid + thid_num + blid * system_size];
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // forward elimination
   for (int j = 0; j < iterations; j++)
   {
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     stride <<= 1;
     int delta = stride >> 1;
@@ -232,7 +232,7 @@ void cyclic_branch_free_kernel(
   for (int j = 0; j < iterations; j++)
   {
     int delta = stride >> 1;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (thid < thid_num)
     {
       int i = stride * thid + (stride >> 1) - 1;
@@ -252,7 +252,7 @@ void cyclic_branch_free_kernel(
     thid_num <<= 1;
   }
 
-  item.barrier(sycl::access::fence_space::local_space);   
+  sycl::group_barrier(item.get_group());   
 
   x_d[thid + blid * system_size] = x[thid];
   x_d[thid + half_size + blid * system_size] = x[thid + half_size];

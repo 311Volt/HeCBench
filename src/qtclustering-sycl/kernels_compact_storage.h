@@ -112,7 +112,7 @@ int generate_candidate_cluster_compact_storage(
       candidate_cluster[0] = seed_point;
     Ai_mask[seed_point] = 1;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   seed_p_off = seed_point*max_degree;
   latest_point = seed_point;
 
@@ -134,7 +134,7 @@ int generate_candidate_cluster_compact_storage(
   }while(0);
 
   // different threads might exit this loop at different times, so let them catch up.
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while( (cnt < point_count) && flag ){
     int point_index = -1;
@@ -160,19 +160,19 @@ int generate_candidate_cluster_compact_storage(
     }while(0);
 
     // different threads might exit this loop at different times, so let them catch up.
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // The following loop implements the "find point pj s.t. diameter(Ai && pj) is minimum"
     for(int i=12; i*curThreadCount+tid < max_degree; i++){
       FETCH_POINT( cand_pnt_i, i );
       COMPUTE_DIAMETER_WITH_POINT( cand_pnt_i, curr_dist_to_clust_i, i );
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     //min_G_index = closest_point_reduction(min_dist, threshold, point_index);
     dist_array[tid] = min_dist;
     point_index_array[tid] = point_index;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     if(tid == 0 ){
       for(int j=1; j<curThreadCount; j++){
@@ -186,7 +186,7 @@ int generate_candidate_cluster_compact_storage(
       if( min_dist > threshold )
         point_index_array[0] = -1;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     int min_G_index = point_index_array[0];
 
@@ -203,9 +203,9 @@ int generate_candidate_cluster_compact_storage(
       flag = false;
     }
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   return cnt;
 }

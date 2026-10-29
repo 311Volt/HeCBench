@@ -125,7 +125,7 @@ void JacobiIteration(const float *du0, const float *dv0,
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (ix >= w || iy >= h) return;
 

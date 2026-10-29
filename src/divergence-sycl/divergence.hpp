@@ -97,7 +97,7 @@ __attribute__((noinline)) void divergence_sphere_gpu(
         d_div[j*np+l] = dudx00;
         d_vvtemp[l*np+j] = dvdy00;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       if (l < np && j < np) 
         d_div[l*np+j] = (d_div[l*np+j] + d_vvtemp[l*np+j]) * 

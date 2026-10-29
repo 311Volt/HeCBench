@@ -8,7 +8,7 @@ void reduceInShared_native(sycl::half2 *const v, sycl::nd_item<1> &item)
   #pragma unroll
   for (int i = NUM_OF_THREADS/2; i >= 1; i = i / 2) {
     if(lid<i) v[lid] = v[lid] + v[lid+i];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 
@@ -19,7 +19,7 @@ void reduceInShared_native(sycl::float2 *const v, sycl::nd_item<1> &item)
   #pragma unroll
   for (int i = NUM_OF_THREADS/2; i >= 1; i = i / 2) {
     if(lid<i) v[lid] = v[lid] + v[lid+i];
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 
@@ -44,7 +44,7 @@ void scalarProductKernel_native(const sycl::half2 *a,
   }
 
   shArray[lid] = value;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   reduceInShared_native(shArray, item);
 
   if (lid == 0)
@@ -79,7 +79,7 @@ void scalarProductKernel_native_fp32(const sycl::half2 *a,
   }
 
   shArray[lid] = value;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
   reduceInShared_native(shArray, item);
 
   if (lid == 0)

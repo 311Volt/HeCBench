@@ -3,7 +3,7 @@
 #define T23 sycl::pow(2.0, 23.0)
 #define T46 (T23*T23)
 
-#define syncthreads() item.barrier(sycl::access::fence_space::local_space);
+#define syncthreads() sycl::group_barrier(item.get_group());
 
 inline int atomicAdd(int &val, int operand) 
 {

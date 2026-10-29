@@ -62,7 +62,7 @@ namespace mean_shift::gpu {
         }
         valid_data[lid] = 0;
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
       for (int i = 0; i < TILE_WIDTH; ++i) {
         int local_row_tile = i * D;
         float valid_radius = RADIUS * valid_data[i];
@@ -79,7 +79,7 @@ namespace mean_shift::gpu {
           tot_weight += (weight * valid_data[i]);
         }
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
     if (tid < N) {
       for (int j = 0; j < D; ++j) {

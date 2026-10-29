@@ -57,7 +57,7 @@ void bitonic_sort( T* sh_data, const uint localid,
 
       sh_data[pos]     = select(lesser, greater, direction);
       sh_data[pos + j] = select(greater, lesser, direction);
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
   }
 
@@ -69,7 +69,7 @@ void bitonic_sort( T* sh_data, const uint localid,
     sh_data[pos]      = select(av, bv, sortThem);
     sh_data[pos + j]  = select(bv, av, sortThem);
 
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 }
 
@@ -97,7 +97,7 @@ void sort_threshold( T* data_in,
         temp[i] = UINT_MAX;
       }
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     bitonic_sort(temp, localid, item);
 
     for (uint i = localid; i < tsum; i += LQSORT_LOCAL_WORKGROUP_SIZE) {
@@ -164,7 +164,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
 
   // Set thread __shared__ counters to zero
   lt[localid] = gt[localid] = 0;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Align thread accesses for coalesced reads.
   // Go through data...
@@ -179,7 +179,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
   }
   lt[localid] = ltp;
   gt[localid] = gtp;
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // calculate cumulative sums
   uint n;
@@ -189,7 +189,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
       lt[localid] += lt[localid-i];
       gt[localid] += gt[localid-i];
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   if ((localid & n) == n) {
@@ -205,7 +205,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
       plus_prescan(&lt[localid - i], &lt[localid]);
       plus_prescan(&gt[localid - i], &gt[localid]);
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
   }
 
   // Allocate memory in the sequence this block is a part of
@@ -223,7 +223,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
     // Atomic is necessary since multiple blocks access this
     gbeg = atomicSub(*psend, gtsum) - gtsum;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Allocate locations for work items
   lfrom = lbeg + lt[localid];
@@ -239,7 +239,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
     if (tmp > pivot)
       sn[gfrom++] = tmp;
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (localid == 0) {
     //if (atomic_dec(pblockcount) == 0) {
@@ -290,7 +290,7 @@ void gqsort_kernel(T *d, T *dn, block_record<T> *blocks, parent_record *parents,
     ++workstack_pointer;                                                       \
     workstack_record wr = {(START), (END), direction ^ 1};                     \
     workstack[workstack_pointer] = wr;                                         \
-  } item.barrier(sycl::access::fence_space::local_space);
+  } sycl::group_barrier(item.get_group());
 
 //---------------------------------------------------------------------------------------
 // Kernel implements the last stage of GPU-Quicksort, when all the subsequences are small
@@ -348,7 +348,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
       mys[i] = dn[i+d_offset];
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   while (workstack_pointer >= 0) {
     // pop up the stack
@@ -356,7 +356,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
     start = wr.start;
     end = wr.end;
     direction = wr.direction;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     if (localid == 0) {
       --workstack_pointer;
 
@@ -372,7 +372,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
     // Set thread __shared__ counters to zero
     lt[localid] = gt[localid] = 0;
     ltp = gtp = 0;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Pick a pivot
     uint pivot = s[start];
@@ -392,7 +392,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
     }
     lt[localid] = ltp;
     gt[localid] = gtp;
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // calculate cumulative sums
     uint n;
@@ -402,7 +402,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
         lt[localid] += lt[localid-i];
         gt[localid] += gt[localid-i];
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     if ((localid & n) == n) {
@@ -418,7 +418,7 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
         plus_prescan(&lt[localid - i], &lt[localid]);
         plus_prescan(&gt[localid - i], &gt[localid]);
       }
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
     }
 
     // Allocate locations for work items
@@ -435,13 +435,13 @@ lqsort_kernel(T* d, T* dn, work_record<T>* seqs,
       if (tmp > pivot)
         sn[gfrom++] = tmp;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // Store the pivot value between the new sequences
     for (i = start + ltsum + localid;i < end - gtsum; i += LQSORT_LOCAL_WORKGROUP_SIZE) {
       d[i+d_offset] = pivot;
     }
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
 
     // if the sequence is shorter than SORT_THRESHOLD
     // sort it using an alternative sort and place result in d

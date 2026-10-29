@@ -67,7 +67,7 @@ double run_gmem_atomics(
         for (int i = t; i < ACTIVE_CHANNELS * NUM_BINS; i += nt)
             d_part_hist[g * NUM_PARTS + i] = 0;
 
-        item.barrier(sycl::access::fence_space::global_and_local);
+        sycl::group_barrier(item.get_group());
 
         // process pixels (updates our group's partial histogram in gmem)
         for (int col = x; col < width; col += nx)

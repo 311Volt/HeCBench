@@ -90,7 +90,7 @@ void surfel_render_tile(
                 sh[tid * COL_DIM + k] = s[(base + tid) * COL_DIM + k];
             }
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         int tileCount = sycl::min(TILE, N - base);
 
@@ -121,7 +121,7 @@ void surfel_render_tile(
                 dMin = t;
             }
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
     }
 
     d[y * w + x] = (dMin > T(100)) ? T(0) : dMin;

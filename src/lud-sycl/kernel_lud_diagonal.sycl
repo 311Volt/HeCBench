@@ -7,7 +7,7 @@
 		array_offset += matrix_dim;
 	}
   
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
   
 	for(i=0; i < BLOCK_SIZE-1; i++) {
 
@@ -17,14 +17,14 @@
 		shadow[tx * BLOCK_SIZE + i] /= shadow[i * BLOCK_SIZE + i];
     }
 
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
     if (tx>i){
 
       for(j=0; j < i+1; j++)
         shadow[(i+1) * BLOCK_SIZE + tx] -= shadow[(i+1) * BLOCK_SIZE + j]*shadow[j * BLOCK_SIZE + tx];
     }
     
-	item.barrier(sycl::access::fence_space::local_space);
+	sycl::group_barrier(item.get_group());
     }
 
     array_offset = (offset+1)*(size_t)matrix_dim+offset;

@@ -42,7 +42,7 @@ void sampled_rows_kernel(
       rand_idx = (int)(LCG_random_double(&seed) * ncols);
     }
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // Each block processes one row of X. Columns are iterated over by blockDim.x at a time to ensure data coelescing
   int col_idx = lid;

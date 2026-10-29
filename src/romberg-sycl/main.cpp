@@ -53,7 +53,7 @@ void romberg(double a, double b, double *result, double *smem, sycl::nd_item<1> 
 
   for(int i = 0; i < ROW_SIZE; i++)
     smem[ROW_SIZE*threadIdx_x + i] = local_col[i];
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if(threadIdx_x < ROW_SIZE)
   {

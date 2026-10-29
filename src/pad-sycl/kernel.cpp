@@ -83,7 +83,7 @@ void Padding_kernel(int n, int m, int pad, int n_tasks, float alpha,
             pos2     = my_s_row * n + my_x;
         }
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         // Set global synch
         if(threadIdx_x == 0) {
@@ -97,7 +97,7 @@ void Padding_kernel(int n, int m, int pad, int n_tasks, float alpha,
             atomicAdd(flags[my_s + 1], 1);
 #endif
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         pos = matrix_size_align - 1 - (my_s * REGS * blockDim_x + threadIdx_x);
 // Store to global memory

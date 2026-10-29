@@ -42,7 +42,7 @@ void reduce(const float *inputVec, double *outputVec, size_t inputSize, size_t o
   }
   tmp[local_tid] = temp_sum;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   sycl::sub_group tile = item.get_sub_group();
 
@@ -58,7 +58,7 @@ void reduce(const float *inputVec, double *outputVec, size_t inputSize, size_t o
     }
     sycl::group_barrier(tile);
   }
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (local_tid == 0 && global_gid < outputSize) {
     beta  = 0.0;
@@ -84,7 +84,7 @@ void reduceFinal(const double *inputVec, double *result, size_t inputSize,
   }
   tmp[item.get_local_linear_id()] = temp_sum;
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   //sycl::sub_group tile = item.get_sub_group();
 
@@ -96,7 +96,7 @@ void reduceFinal(const double *inputVec, double *result, size_t inputSize,
         temp_sum + tmp[item.get_local_linear_id() + 256];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if ((item.get_local_range(2) >= 256) &&
       (item.get_local_linear_id() < 128))
@@ -105,7 +105,7 @@ void reduceFinal(const double *inputVec, double *result, size_t inputSize,
         temp_sum + tmp[item.get_local_linear_id() + 128];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if ((item.get_local_range(2) >= 128) &&
       (item.get_local_linear_id() < 64))
@@ -114,7 +114,7 @@ void reduceFinal(const double *inputVec, double *result, size_t inputSize,
         temp_sum + tmp[item.get_local_linear_id() + 64];
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   if (item.get_local_linear_id() < 32)
   {

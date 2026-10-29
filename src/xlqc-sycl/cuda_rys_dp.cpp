@@ -1565,7 +1565,7 @@ void cuda_mat_J_PI_dp(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // only update mat_J_PI on one thread of the block
   if (0 == threadIdx_x && 0 == threadIdx_y)
@@ -1639,7 +1639,7 @@ void cuda_mat_K_PI_dp(
     }
   }
 
-  item.barrier(sycl::access::fence_space::local_space);
+  sycl::group_barrier(item.get_group());
 
   // only update mat_K_PI on one thread of the block
   if (0 == threadIdx_x && 0 == threadIdx_y)

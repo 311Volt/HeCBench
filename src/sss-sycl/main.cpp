@@ -82,7 +82,7 @@ gsl_rng *rnd;
 #ifdef USE_GPU
 #include <sycl/sycl.hpp>
 #define BLOCK_SIZE 32
-#define SYNC item.barrier(sycl::access::fence_space::local_space)
+#define SYNC sycl::group_barrier(item.get_group())
 typedef struct {
   sycl::queue delete_stream;
   sycl::queue add_stream;

@@ -171,7 +171,7 @@ if(frame_no == 0){
   //  SYNCHRONIZE THREADS
   //====================================================================================================100
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //====================================================================================================100
   //  checksum
@@ -187,7 +187,7 @@ if(frame_no == 0){
   //  SYNCHRONIZE THREADS
   //====================================================================================================100
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //====================================================================================================100
   //  End
@@ -239,7 +239,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //====================================================================================================100
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //====================================================================================================100
   //  checksum
@@ -255,7 +255,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //====================================================================================================100
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //====================================================================================================100
   //  CONVOLUTION
@@ -292,7 +292,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -308,7 +308,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  ACTUAL CONVOLUTION
@@ -380,7 +380,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -396,7 +396,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -444,7 +444,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -460,7 +460,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  VERTICAL CUMULATIVE SUM
@@ -491,7 +491,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -507,7 +507,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION
@@ -539,7 +539,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -555,7 +555,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION 2
@@ -587,7 +587,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -602,7 +602,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
 
   //==================================================50
@@ -625,7 +625,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -641,7 +641,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  HORIZONTAL CUMULATIVE SUM
@@ -672,7 +672,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -688,7 +688,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION
@@ -720,7 +720,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -736,7 +736,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION 2
@@ -768,7 +768,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -784,7 +784,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SUBTRACTION
@@ -806,7 +806,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -822,7 +822,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -852,7 +852,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -868,7 +868,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  PAD ARRAY, VERTICAL CUMULATIVE SUM
@@ -912,7 +912,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -928,7 +928,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  VERTICAL CUMULATIVE SUM
@@ -959,7 +959,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -975,7 +975,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION
@@ -1007,7 +1007,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1023,7 +1023,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION 2
@@ -1055,7 +1055,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1071,7 +1071,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SUBTRACTION
@@ -1093,7 +1093,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1109,7 +1109,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  HORIZONTAL CUMULATIVE SUM
@@ -1140,7 +1140,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1156,7 +1156,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION
@@ -1188,7 +1188,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1204,7 +1204,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SELECTION 2
@@ -1236,7 +1236,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1252,7 +1252,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  SUBTRACTION
@@ -1274,7 +1274,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1290,7 +1290,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -1325,7 +1325,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1341,7 +1341,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  MULTIPLICATION
@@ -1363,7 +1363,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1379,7 +1379,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  IN SUM
@@ -1406,7 +1406,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1422,7 +1422,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  IN_SQR SUM
@@ -1448,7 +1448,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1464,7 +1464,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  FINAL SUMMATION
@@ -1492,7 +1492,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1506,7 +1506,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  DENOMINATOR T
@@ -1530,7 +1530,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1544,7 +1544,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  DENOMINATOR    SAVE RESULT IN CUMULATIVE SUM A2
@@ -1566,7 +1566,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1582,7 +1582,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  NUMERATOR  SAVE RESULT IN CONVOLUTION
@@ -1604,7 +1604,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1620,7 +1620,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  CORRELATION  SAVE RESULT IN CUMULATIVE SUM A2
@@ -1643,7 +1643,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1659,7 +1659,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -1702,7 +1702,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1718,7 +1718,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -1794,7 +1794,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1810,7 +1810,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -1847,7 +1847,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1863,7 +1863,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  FINAL SEARCH
@@ -1901,7 +1901,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 
   //==================================================50
   //  checksum
@@ -1915,7 +1915,7 @@ if(frame_no != 0){
   //  SYNCHRONIZE THREADS
   //==================================================50
 
-  item.barrier();
+  sycl::group_barrier(item.get_group());
 #endif
   //==================================================50
   //  End
@@ -1973,7 +1973,7 @@ if(frame_no != 0){
     //  SYNCHRONIZE THREADS
     //==================================================50
 
-    item.barrier();
+    sycl::group_barrier(item.get_group());
 
     //==================================================50
     //  checksum
@@ -1989,7 +1989,7 @@ if(frame_no != 0){
     //  SYNCHRONIZE THREADS
     //==================================================50
 
-    item.barrier();
+    sycl::group_barrier(item.get_group());
 #endif
     //==================================================50
     //  End

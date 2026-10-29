@@ -1,7 +1,7 @@
 #ifndef BIT_VECTOR_KERNELS_CUH
 #define BIT_VECTOR_KERNELS_CUH
 
-#define __syncthread() item.barrier(sycl::access::fence_space::local_space)
+#define __syncthread() sycl::group_barrier(item.get_group())
 
 template<typename T, sycl::memory_scope MemoryScope = sycl::memory_scope::device>
 static inline void atomicAdd(T& val, const T delta)

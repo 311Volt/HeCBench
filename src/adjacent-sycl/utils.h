@@ -1,7 +1,7 @@
 #pragma once
 
 #define CTA_SYNC() \
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
 struct NullType
 {
