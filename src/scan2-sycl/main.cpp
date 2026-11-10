@@ -41,7 +41,7 @@ void bScan(sycl::queue &q,
       /* Cache the computational window in shared memory */
       block[2*tid]     = input[2*gid];
       block[2*tid + 1] = input[2*gid + 1];
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       float cache0 = block[0];
       float cache1 = cache0 + block[1];
@@ -52,12 +52,12 @@ void bScan(sycl::queue &q,
           cache0 = block[2*tid-stride]+block[2*tid];
           cache1 = block[2*tid+1-stride]+block[2*tid+1];
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         block[2*tid] = cache0;
         block[2*tid+1] = cache1;
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
 
       /* store the value in sum buffer before making it to 0 */
@@ -95,7 +95,7 @@ void pScan(sycl::queue &q,
       /* Cache the computational window in shared memory */
       block[2*tid]     = input[2*gid];
       block[2*tid + 1] = input[2*gid + 1];
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       float cache0 = block[0];
       float cache1 = cache0 + block[1];
@@ -107,12 +107,12 @@ void pScan(sycl::queue &q,
           cache0 = block[2*tid-stride]+block[2*tid];
           cache1 = block[2*tid+1-stride]+block[2*tid+1];
         }
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         block[2*tid] = cache0;
         block[2*tid+1] = cache1;
 
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
       }
 
       /*write the results back to global memory */
@@ -147,7 +147,7 @@ void bAddition(sycl::queue &q,
 
       /* Only 1 thread of a group will read from global buffer */
       if(localId == 0) value = input[groupId];
-      item.barrier(sycl::access::fence_space::local_space);
+      sycl::group_barrier(item.get_group());
 
       output[globalId] += value;
     });

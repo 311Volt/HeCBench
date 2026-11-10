@@ -66,7 +66,7 @@ void dwtHaar1D(sycl::nd_item<1> &item,
     sharedArray[localId] = t0;
     sharedArray[localSize + localId] = t1;
      
-    item.barrier(sycl::access::fence_space::local_space);
+    sycl::group_barrier(item.get_group());
     
     unsigned int levels = tLevels > mLevels ? mLevels: tLevels;
     unsigned int activeThreads = (1 << levels) / 2;
@@ -84,7 +84,7 @@ void dwtHaar1D(sycl::nd_item<1> &item,
         }
 
         /* make sure all work items have read from sharedArray before modifying it */
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
 
         if(localId < activeThreads)
         {
@@ -95,7 +95,7 @@ void dwtHaar1D(sycl::nd_item<1> &item,
             midOutPos >>= 1;
         }
         activeThreads >>= 1;
-        item.barrier(sycl::access::fence_space::local_space);
+        sycl::group_barrier(item.get_group());
     }
     
     /**
