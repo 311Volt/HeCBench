@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <chrono>
 #include <sycl/sycl.hpp>
 
 #define VECTOR_SIZE (8*1024*1024)

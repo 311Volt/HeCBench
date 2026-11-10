@@ -5,6 +5,7 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
+#include <chrono>
 #include <sycl/sycl.hpp>
 #include "util.h"
 

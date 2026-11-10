@@ -37,6 +37,8 @@
  * along with BitCracker. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <chrono>
+#include <iostream>
 #include <sycl/sycl.hpp>
 #include "bitcracker.h"
 #include "utils.h"

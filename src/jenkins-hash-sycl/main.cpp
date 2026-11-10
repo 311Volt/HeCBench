@@ -1,6 +1,7 @@
 #include <stdio.h>      /* defines printf for tests */
 #include <stdlib.h>     /* defines atol and posix_memalign */
 #include <string.h>     /* defines memcpy */
+#include <chrono>
 #include <sycl/sycl.hpp>
 
 #define rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))

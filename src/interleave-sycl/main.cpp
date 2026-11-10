@@ -3,6 +3,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <chrono>
 #include <sycl/sycl.hpp>
 
 #define NUM_ELEMENTS 4096

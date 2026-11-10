@@ -1,3 +1,4 @@
+#include <chrono>
 #include "util.h"
 
 const char inputName128[] = "data/input_14_1_128.bin";
