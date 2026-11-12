@@ -135,7 +135,11 @@ lid-driven-cavity: no_check  # prints per-iteration residuals without a threshol
 log2: no_check  # prints an RMSE without a threshold; the host comparison is under #ifdef HOST
 logic-resim: no_check  # no verification; the result goes to toy-result.saif
 lsqt: no_check
-lud: no_check  # verifies only with -v, which the run target does not pass
+# the run target passes -v: the single-threaded CPU check is O(n^3), 15 s at n=2048 (about 16 min at 8192)
+lud:
+  checks:
+    contains: ">>>Verify<<<<"
+    not_contains: "mismatch at"
 mallocFree: no_check
 # 'Failure' is printed when the verification throws
 mandelbrot:

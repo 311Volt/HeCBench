@@ -87,4 +87,4 @@ clean:
 	rm -rf $(program) $(obj)
 
 run: $(program)
-	$(LAUNCHER) ./$(program) -s 8192
+	$(LAUNCHER) ./$(program) -s 2048 -v
