@@ -1,0 +1,233 @@
+# Pass rules for llvm-project/.github/workflows/hecbench/hecbench_p1.py.
+#
+# Every benchmark must exit with code 0. A rule may add checks on its output:
+#
+#   name: no_check          nothing beyond the exit code can be checked; the
+#                           program prints no verdict (usually timings only)
+#   name: pass_or_fail      the output contains PASS and does not contain FAIL
+#   name:
+#     checks:               all of the following must hold
+#       contains: "text"    some output line has it (a string or a list)
+#       not_contains: [...] no output line has it (a string or a list)
+#       number:             the number printed after the text is in bounds
+#         {after: "text", min: 0.0, max: 1.0e-5}   (write floats as 1.0e-5)
+#
+# Texts are case-sensitive substrings of the output (stdout and stderr merged).
+# Take them from what the benchmark itself prints, and make sure they cannot
+# appear in a passing run. Comments say why a rule is what it is.
+
+ace: pass_or_fail  # needs VERIFY=yes: the comparison is under #ifdef VERIFY (Makefile:70)
+adv: pass_or_fail
+# prints Pass/Fail, not PASS/FAIL
+aes:
+  checks:
+    contains: Pass
+    not_contains: Fail
+# per-type 'TEST FAIL' lines, then a final verdict
+aligned-types:
+  checks:
+    contains: Test passed
+    not_contains: ["Test failed!", TEST FAIL]
+# a mismatch is printed but the program still exits 0
+allreduce:
+  checks:
+    contains: Verified allreduce for size
+    not_contains: Unexpected result from allreduce
+# silent on success; the errors are only printed when non-zero
+amgmk:
+  checks:
+    not_contains: ["Matvec: error:", "Relax: error:", "Axpy: error:"]
+# triggers device asserts on purpose, so their output is expected
+assert:
+  checks:
+    contains: "Test assert completed, returned OK"
+    not_contains: "returned ERROR!"
+b+tree: no_check  # result dumps are under #ifdef DEBUG
+babelstream: pass_or_fail
+backprop: pass_or_fail
+bfs: pass_or_fail
+bitcracker: no_check  # 'Password found' / 'not found' has no expected outcome
+bitonic-sort: pass_or_fail
+# silent on success; verify() is under #ifdef DEBUG, which VERIFY=yes enables (Makefile:61)
+bsearch:
+  checks:
+    not_contains: incorrect result
+bspline-vgh: pass_or_fail
+burger: pass_or_fail
+bwt: no_check  # prints nothing
+chacha20: pass_or_fail
+che: no_check
+chemv: pass_or_fail
+chi2: pass_or_fail
+concat: pass_or_fail
+concurrentKernels: pass_or_fail
+contract: no_check  # checksum without an expected value
+convolutionSeparable: pass_or_fail
+# lowercase pass/fail, one pair per test
+crc64:
+  checks:
+    contains: pass pass
+    not_contains: fail
+cross: pass_or_fail
+crs: no_check  # output dump needs OUTPUT=yes
+d3q19-bgk: no_check  # its OK/FAILED check only runs for N=102; the run target uses N=128
+damage: no_check
+dct8x8: pass_or_fail
+debayer: no_check  # checksum without an expected value; the asserts are under #ifdef DEBUG
+dense-embedding: pass_or_fail
+dispatch: no_check
+divergence: no_check  # prints CPU/GPU differences without a threshold
+dslash: no_check  # verifies with assert() (no NDEBUG), so a failure aborts
+dwconv: pass_or_fail
+ecdh: pass_or_fail
+eigenvalue: pass_or_fail
+# silent on success
+extend2:
+  checks:
+    not_contains: "Error: "
+# silent on success
+extrema:
+  checks:
+    not_contains: ["1D test: FAILED", "2D test: FAILED"]
+face: no_check  # the output image is not compared
+fdtd3d: pass_or_fail  # exits 0 even on FAIL
+flip: pass_or_fail
+floydwarshall: pass_or_fail
+fwt: pass_or_fail
+ga: pass_or_fail
+gamma-correction: pass_or_fail
+gaussian:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, Result mismatch at index]
+# runtests.sh always exits 0 and logs success to a file, so only 'Test Failed' lines show a failure
+grep:
+  checks:
+    not_contains: Test Failed
+heartwall: no_check  # output dump is under #ifdef OUTPUT
+heat2d: pass_or_fail
+hmm:
+  checks:
+    contains: Success
+    not_contains: Fail
+hotspot: pass_or_fail
+hotspot3D: no_check  # prints an RMSE without a threshold
+hypterm: no_check
+interleave: no_check  # verifies with assert() (no NDEBUG), so a failure aborts
+iso2dfd: pass_or_fail
+jenkins-hash:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, "Error: at"]
+keccaktreehash: pass_or_fail
+keogh: pass_or_fail
+kernelLaunch: no_check
+kiss: no_check  # prints the first random numbers; no reference
+kmeans: no_check  # prints an RMSE without a threshold
+lanczos: no_check  # prints GPU and CPU eigenvalues without comparing them
+lavaMD: no_check  # results dump needs OUTPUT=yes
+layout: pass_or_fail
+lfib4:
+  checks:
+    contains: "check = PASS"
+    not_contains: "check = FAIL"
+lid-driven-cavity: no_check  # prints per-iteration residuals without a threshold
+log2: no_check  # prints an RMSE without a threshold; the host comparison is under #ifdef HOST
+logic-resim: no_check  # no verification; the result goes to toy-result.saif
+lsqt: no_check
+lud: no_check  # verifies only with -v, which the run target does not pass
+mallocFree: no_check
+# 'Failure' is printed when the verification throws
+mandelbrot:
+  checks:
+    contains: Success
+    not_contains: [Fail verification, Failure]
+mask: pass_or_fail
+matrix-rotate: pass_or_fail
+matrixT: pass_or_fail
+maxFlops: no_check
+mcpr: pass_or_fail
+md5hash:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, "ERROR:"]
+memcpy: no_check
+merge: pass_or_fail
+minimap2: no_check  # the output file is not compared
+minimod: no_check  # checksum without an expected value
+# silent on success; errors go to stderr
+mis:
+  checks:
+    not_contains: ["ERROR: found unprocessed node", "ERROR: found adjacent nodes", "ERROR: set is not maximal", "ERROR: could not allocate"]
+mixbench:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, Verification failed]
+mrc: pass_or_fail
+# a failed comparison leaves the exit code at 0 (multimat.cpp:723)
+multimaterial:
+  checks:
+    contains: "All tests passed!"
+    not_contains: ["values are not equal!", "Error: no materials"]
+murmurhash3:
+  checks:
+    contains: SUCCESS
+    not_contains: FAIL
+nqueen: pass_or_fail  # the run args 15 7 100 select the size that prints a verdict
+ntt: pass_or_fail
+nw: pass_or_fail
+overlap: pass_or_fail
+# without two peer-capable GPUs it prints 'waiving test' and exits 0 without PASS; that counts as a failure
+p2p:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, Verification error]
+particlefilter: no_check
+pathfinder: pass_or_fail
+permute:
+  checks:
+    contains: All results match
+    not_contains: Mismatch of
+pns: no_check  # prints statistics without expected values
+prefetch: pass_or_fail
+present: pass_or_fail
+radixsort:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, Unordered key]
+reaction: no_check  # prints min/max concentrations only
+resnet-kernels: no_check  # output_checker is never called
+reverse: pass_or_fail
+ring: pass_or_fail
+rotary: pass_or_fail
+rtm8: pass_or_fail
+s8n: pass_or_fail
+scan: pass_or_fail
+scan2: pass_or_fail
+secp256k1: pass_or_fail  # exits 0 even on FAIL
+# the same bound as the program's own exit condition (main.cpp:217)
+simpleMultiDevice:
+  checks:
+    number: {after: "Relative difference:", max: 1.0e-05}
+sosfil: pass_or_fail
+split: pass_or_fail
+srad: no_check
+stencil1d:
+  checks:
+    contains: PASS
+    not_contains: [FAIL, Error at]
+stencil3d: no_check  # dump is under #ifdef DUMP
+streamcluster: no_check  # output.txt is not compared
+su3: no_check  # verifies with assert() (no NDEBUG), so a failure aborts
+sw4ck: no_check  # prints 'Error = X %' without a tolerance
+tensorAccessor: pass_or_fail
+tensorT: pass_or_fail
+thomas: no_check  # prints 'Maximum error' without a threshold
+triad: pass_or_fail
+unfold: pass_or_fail
+winograd: pass_or_fail
+wyllie: pass_or_fail
+zerocopy:
+  checks:
+    contains: SUCCESS
+    not_contains: FAILURE

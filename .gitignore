@@ -23,6 +23,6 @@ main
 
 # Exclude JSON files except CMake presets
 *.json
-!pass_rules.json
+!pass_rules.yaml
 !CMakePresets.json
 !CMakeUserPresets.json
