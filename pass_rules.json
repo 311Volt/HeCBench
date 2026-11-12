@@ -1,0 +1,963 @@
+{
+  "schema_version": 1,
+  "description": "Pass criteria for llvm-project .github/workflows/hecbench/hecbench_p1.py; all checks must hold.",
+  "benchmarks": {
+    "ace": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:479-491 compares with the CPU reference under #ifdef VERIFY (VERIFY=yes adds -DVERIFY, Makefile:70)"
+    },
+    "adv": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:310 prints PASS or FAIL (|diff| > 1e-4 vs reference)"
+    },
+    "aes": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Pass"},
+        {"check": "not_contains", "text": "Fail"}
+      ],
+      "note": "main.cpp:154-158 prints Pass or Fail (memcmp with CPU reference), run for both args"
+    },
+    "aligned-types": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Test passed"},
+        {"check": "not_contains", "text": "Test failed!"},
+        {"check": "not_contains", "text": "TEST FAIL"}
+      ],
+      "note": "main.cpp:245 prints 'TEST PASS'/'TEST FAIL' per type; main.cpp:330-334 prints 'Test failed!' or 'Test passed'"
+    },
+    "allreduce": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Verified allreduce for size"},
+        {"check": "not_contains", "text": "Unexpected result from allreduce"}
+      ],
+      "note": "main.cpp:70-84 prints 'Unexpected result from allreduce' on mismatch (then returns), else 'Verified allreduce for size'"
+    },
+    "amgmk": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "Matvec: error:"},
+        {"check": "not_contains", "text": "Relax: error:"},
+        {"check": "not_contains", "text": "Axpy: error:"}
+      ],
+      "note": "main.cpp:195,324,389 print '<test>: error: %e' only when error > 0 (silent on success)"
+    },
+    "assert": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Test assert completed, returned OK"},
+        {"check": "not_contains", "text": "returned ERROR!"}
+      ],
+      "note": "main.cpp:73-79 prints 'Test assert completed, returned OK' and exits 0; runTest (main.cpp:81-110) deliberately triggers device asserts (their output is expected) and always returns true"
+    },
+    "b+tree": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.c prints only timings; ans/recstart dumps are under #ifdef DEBUG (kernel/kernel_wrapper.c:82) and results go to output.txt without comparison"
+    },
+    "babelstream": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:296 prints PASS or FAIL"
+    },
+    "backprop": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:149 prints PASS or FAIL (tolerance 1e-3)"
+    },
+    "bfs": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "bfs.cpp:305 compare_results (util.h:37) prints PASS or FAIL"
+    },
+    "bitcracker": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: attack.cpp:1091-1092 prints 'Password found'/'Password not found!' with no stated expected outcome (reference log prints 'not found')"
+    },
+    "bitonic-sort": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:208 prints PASS or FAIL"
+    },
+    "bsearch": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "incorrect result"}
+      ],
+      "note": "main.cpp:15-30 verify() prints only on mismatch; under #ifdef DEBUG (VERIFY=yes adds -DDEBUG, Makefile:61)"
+    },
+    "bspline-vgh": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:304-327 prints PASS or FAIL"
+    },
+    "burger": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:240 prints PASS or FAIL"
+    },
+    "bwt": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: bwt.cpp prints nothing and has no verification"
+    },
+    "chacha20": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:131 prints PASS or FAIL"
+    },
+    "che": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:343 prints only kernel time; results written to ./out files without comparison; DEBUG not defined"
+    },
+    "chemv": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:190-193 prints PASS or FAIL (1e-3 tolerance vs CPU)"
+    },
+    "chi2": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "chi2.cpp:150-155 compares with CPU (tol 1e-4), prints PASS or FAIL"
+    },
+    "concat": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:121 prints PASS or FAIL"
+    },
+    "concurrentKernels": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:136 prints PASS or FAIL"
+    },
+    "contract": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:408 prints only 'Checksum: ... min max' with no expected value"
+    },
+    "convolutionSeparable": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:131 prints PASS or FAIL (L2 norm vs CPU < 1e-6)"
+    },
+    "crc64": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "pass pass"},
+        {"check": "not_contains", "text": "fail"}
+      ],
+      "note": "CRC64Test.cpp:109-117 prints 'pass'/'fail' for the two CRC checks per test"
+    },
+    "cross": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:213-220 prints PASS or FAIL"
+    },
+    "crs": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp prints only timings (main.cpp:190,213); output dump is under #ifdef DUMP (OUTPUT=yes, Makefile:69), not enabled by VERIFY=yes and no comparison exists"
+    },
+    "d3q19-bgk": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:213-219 regression test prints OK/FAILED only when iter == 149 && N == 102, and the run target passes N=128"
+    },
+    "damage": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:92,114 print only 'Average kernel execution time'; no verification code"
+    },
+    "dct8x8": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:49-52 prints PASS or FAIL (relative L2 norm < 1E-6)"
+    },
+    "debayer": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:87 prints 'Checksum: %ld' without an expected value; util.h asserts are under #ifdef DEBUG, not defined"
+    },
+    "dense-embedding": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:238-247 prints PASS or FAIL"
+    },
+    "dispatch": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:43 prints only mean/stddev dispatch latencies; no verification"
+    },
+    "divergence": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: divergence.cpp:104-114 prints per-point CPU/GPU error differences without a threshold or verdict"
+    },
+    "dslash": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:117-120 validates with assert() (no NDEBUG, Makefile:62 -O3 only) and prints only GFLOP/s and GByte/s, so a failure aborts via exit code"
+    },
+    "dwconv": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:252 prints PASS or FAIL"
+    },
+    "ecdh": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:91 prints PASS or FAIL (memcmp of slow vs fast public keys)"
+    },
+    "eigenvalue": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:283,287 prints PASS or FAIL"
+    },
+    "extend2": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "Error: "}
+      ],
+      "note": "main.cpp:35 check() prints 'Error: ' on mismatch and is silent on success"
+    },
+    "extrema": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "1D test: FAILED"},
+        {"check": "not_contains", "text": "2D test: FAILED"}
+      ],
+      "note": "main.cpp:104 and main.cpp:198 print 'Nd test: FAILED' only on GPU/CPU mismatch; silent on success"
+    },
+    "face": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:91-102 prints only detection time and progress messages; output image is not compared"
+    },
+    "fdtd3d": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:36-39 prints PASS or FAIL from runTest (compareData, main.cpp:289)"
+    },
+    "flip": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:161-162 memcmp vs CPU reference, prints PASS or FAIL"
+    },
+    "floydwarshall": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:270-277 prints PASS or FAIL (memcmp vs CPU reference)"
+    },
+    "fwt": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:149 prints PASS or FAIL (L2 norm vs CPU < 1e-6)"
+    },
+    "ga": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:129-135 memcmp vs reference, prints PASS or FAIL"
+    },
+    "gamma-correction": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:115-120 prints PASS or FAIL (compares with serial result)"
+    },
+    "gaussian": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Result mismatch at index"}
+      ],
+      "note": "gaussianElim.cpp:156-160 prints 'Result mismatch at index' lines, then PASS or FAIL"
+    },
+    "grep": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "Test Failed"}
+      ],
+      "note": "runtests.sh:37-41,47-50 echoes 'Test Failed' when diff vs egrep differs; script's own exit code is always 0, success line goes only to RESULTS file"
+    },
+    "heartwall": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:202-215 prints only phase timings; output dump is under #ifdef OUTPUT (main.cpp:162), not enabled"
+    },
+    "heat2d": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:151-156 prints 'Mismatch at' lines, then PASS or FAIL"
+    },
+    "hmm": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Success"},
+        {"check": "not_contains", "text": "Fail"}
+      ],
+      "note": "HiddenMarkovModel.cpp:96-99 prints Success or Fail (GPU vs CPU Viterbi path)"
+    },
+    "hotspot": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "hotspot.cpp:241-248 prints PASS or FAIL (|ref-result| <= 1e-3 vs CPU reference)"
+    },
+    "hotspot3D": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: 3D.cpp:150 prints 'Root-mean-square error: %e' without a threshold"
+    },
+    "hypterm": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: kernels.cpp:237-239 prints only kernel times; no reference comparison (check_error at kernels.cpp:9-11 is allocation-only)"
+    },
+    "interleave": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: util.h:46-65 verify() uses assert() and prints nothing; an assert failure aborts, so the exit code catches it"
+    },
+    "iso2dfd": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "iso2dfd.cpp:305 prints PASS or FAIL (within_epsilon 0.1f, iso2dfd.cpp:304)"
+    },
+    "jenkins-hash": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Error: at"}
+      ],
+      "note": "main.cpp:303,309 print 'Error: at' lines then PASS or FAIL"
+    },
+    "keccaktreehash": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "Test.cpp:190 prints PASS or FAIL"
+    },
+    "keogh": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:127 prints PASS or FAIL (abs diff vs CPU reference <= 1e-2)"
+    },
+    "kernelLaunch": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:90-127 prints only average kernel launch times; no verification"
+    },
+    "kiss": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:91-94 prints only 'The first 10 random numbers' and timing; no reference comparison"
+    },
+    "kmeans": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: read_input.c:259 prints 'Root Mean Squared Error' without a threshold"
+    },
+    "lanczos": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:93-103 prints GPU and CPU eigenvalues side by side (print_vector) with no comparison or threshold"
+    },
+    "lavaMD": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:241-246 writes results to a file only under #ifdef OUTPUT (OUTPUT=yes, Makefile:70); run prints only timings and no comparison"
+    },
+    "layout": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:158-161,198-201 prints PASS or FAIL for each check"
+    },
+    "lfib4": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "check = PASS"},
+        {"check": "not_contains", "text": "check = FAIL"}
+      ],
+      "note": "main.cpp:297 prints 'check = PASS' or 'check = FAIL' for each run"
+    },
+    "lid-driven-cavity": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:308 prints per-iteration 'res = %e' and main.cpp:367 timing, no threshold or reference"
+    },
+    "log2": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:97-105 prints only RMSE per precision with no stated threshold; host comparison under #ifdef HOST"
+    },
+    "logic-resim": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: Simulation/src/main prints only 'Total simulation time ...' and parser 'Done vcd Parser!'; no verification in source, results go to toy-result.saif"
+    },
+    "lsqt": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp/lsqt.cpp print only progress and timings; no reference comparison or verdict"
+    },
+    "lud": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: lud.cpp:185-189 verifies only with -v, and the Makefile run target passes -s 8192"
+    },
+    "mallocFree": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:66-166 prints only malloc/free timings; no verification"
+    },
+    "mandelbrot": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "Success"},
+        {"check": "not_contains", "text": "Fail verification"},
+        {"check": "not_contains", "text": "Failure"}
+      ],
+      "note": "mandel.hpp:111,132 print 'Fail verification' and throw; main.cpp:72 prints 'Failure' on exception, main.cpp:76 prints 'Success'"
+    },
+    "mask": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:180 prints PASS or FAIL (memcmp vs host result)"
+    },
+    "matrix-rotate": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:107 prints PASS or FAIL"
+    },
+    "matrixT": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:714-721 prints '*** case %d: kernel FAILED ***' per bad kernel, then PASS or FAIL"
+    },
+    "maxFlops": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp prints only 'kernel execution time (...)' per kernel and has no verification"
+    },
+    "mcpr": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "mcpr-cuda/reference.h:9 verify() (tolerance 1e-3) prints PASS or FAIL, called 3 times at main.cpp:101,130,157"
+    },
+    "md5hash": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "ERROR:"}
+      ],
+      "note": "MD5Hash.cpp:595 prints PASS or FAIL; mismatches print 'ERROR:' at :554-579"
+    },
+    "memcpy": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:65-88 prints only copy timings and 'Timing gap in nanoseconds per byte'; no data verification"
+    },
+    "merge": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:136,146 counts unordered outputs, prints PASS or FAIL"
+    },
+    "minimap2": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:21,25 return 1 on bad args; results go to kernel-out.txt file and are not compared, nothing verdict-like is printed"
+    },
+    "minimod": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:189 prints 'Checksum: min_u,  max_u' without an expected value or threshold"
+    },
+    "mis": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "not_contains", "text": "ERROR: found unprocessed node"},
+        {"check": "not_contains", "text": "ERROR: found adjacent nodes"},
+        {"check": "not_contains", "text": "ERROR: set is not maximal"},
+        {"check": "not_contains", "text": "ERROR: could not allocate"}
+      ],
+      "note": "main.cpp:220-238 prints ERROR: messages to stderr only on failure; silent on success"
+    },
+    "mixbench": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Verification failed"}
+      ],
+      "note": "main.cpp:102,109 prints 'Verification failed at index' and PASS or FAIL"
+    },
+    "mrc": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:215 prints PASS or FAIL"
+    },
+    "multimaterial": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "All tests passed!"},
+        {"check": "not_contains", "text": "values are not equal!"},
+        {"check": "not_contains", "text": "Error: no materials"}
+      ],
+      "note": "compact.cpp:466 prints 'All tests passed!' else compact.cpp:424-459 print 'values are not equal!' (multimat.cpp:723 ignores the result, exit stays 0); multimat.cpp:501 'Error: no materials'"
+    },
+    "murmurhash3": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "SUCCESS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "murmurhash3.cpp:220-221 prints FAIL or SUCCESS"
+    },
+    "nqueen": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:258-262 prints PASS or FAIL for size 15 depth 7 (run args 15 7 100)"
+    },
+    "ntt": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:101,110 prints FAIL (and returns 1) on mismatch, else PASS"
+    },
+    "nw": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "nw.cpp:236 prints PASS or FAIL (memcmp with nw_host)"
+    },
+    "overlap": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:123 prints PASS or FAIL"
+    },
+    "p2p": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Verification error"}
+      ],
+      "note": "main.cpp:158,183-189 prints 'Verification error @' lines then PASS or FAIL (a single-GPU 'waiving test' exit 0 at :246 has no PASS and fails)"
+    },
+    "particlefilter": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:604-605 prints only 'VIDEO SEQUENCE TOOK' / 'PARTICLE FILTER TOOK' timings; no verification in source"
+    },
+    "pathfinder": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:160-161 memcmp against CPU reference, prints PASS or FAIL"
+    },
+    "permute": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "All results match"},
+        {"check": "not_contains", "text": "Mismatch of"}
+      ],
+      "note": "main.cpp:117-123 validate_result (common.hpp:47) prints 'Mismatch of' and exits 1 on error; prints 'All results match' after all block sizes"
+    },
+    "pns": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:102-104 prints mean_vars/var_vars/mean_maxs/var_maxs statistics with no expected values or threshold"
+    },
+    "prefetch": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:86,132 print PASS or FAIL (maxError == 0)"
+    },
+    "present": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:590-593 checksum compare, prints FAIL or PASS"
+    },
+    "radixsort": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Unordered key"}
+      ],
+      "note": "main.cpp:104-107 prints PASS or FAIL; verifySortUint (main.cpp:129-159) prints 'Unordered key' on mismatch"
+    },
+    "reaction": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:272 prints only min/max concentrations (reaction-cuda/util.h:40 stats)"
+    },
+    "resnet-kernels": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp prints only 'Case %d: Average device offload time' timings; util.cpp:45 output_checker is never called"
+    },
+    "reverse": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:101 prints PASS or FAIL (memcmp against gold)"
+    },
+    "ring": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:76-86 checks every element == index and prints PASS or FAIL"
+    },
+    "rotary": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:331-340 compares with host reference and prints PASS or FAIL"
+    },
+    "rtm8": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "rtm8.cpp:219 prints PASS or FAIL"
+    },
+    "s8n": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:237 prints PASS or FAIL"
+    },
+    "scan": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:19 verify() prints PASS or FAIL; called at main.cpp:200,225 for the non-timing run (first iteration, main.cpp:237)"
+    },
+    "scan2": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:314-317 prints PASS or FAIL (compare with tolerance 0.001)"
+    },
+    "secp256k1": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:1253-1255 prints PASS or FAIL (exit code is always 0)"
+    },
+    "simpleMultiDevice": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "number", "after": "Relative difference:", "max": 1e-05}
+      ],
+      "note": "main.cpp:217 exits nonzero unless relative difference < 1e-5; main.cpp:213 prints 'Relative difference:'"
+    },
+    "sosfil": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:215-216 compare_results (tolerance 1e-4) then prints PASS or FAIL"
+    },
+    "split": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:214-218 prints PASS or FAIL from verify() (verify.cpp:3)"
+    },
+    "srad": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:337-369 prints only stage timings; no reference comparison"
+    },
+    "stencil1d": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"},
+        {"check": "not_contains", "text": "Error at"}
+      ],
+      "note": "stencil_1d.cpp:100,111,116 prints 'Error at' on mismatch, then PASS or FAIL"
+    },
+    "stencil3d": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:204 prints only 'Average kernel execution time'; dVm dump at main.cpp:210-214 is under #ifdef DUMP, not defined"
+    },
+    "streamcluster": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: streamcluster.cpp prints only progress/timing; centers are written to output.txt (line 746+) and never compared"
+    },
+    "su3": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: su3_nn_bench.cpp:157-173 verifies with assert() and prints nothing; an assert failure aborts, so the exit code catches it"
+    },
+    "sw4ck": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:210 prints 'Error = <pct> %' vs exact_norm without a stated tolerance"
+    },
+    "tensorAccessor": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:164-173 prints PASS or FAIL"
+    },
+    "tensorT": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:29,34 verify() prints PASS or FAIL"
+    },
+    "thomas": {
+      "checks": [
+        {"check": "exit_code", "expect": 0}
+      ],
+      "note": "no check: main.cpp:198 calcError prints 'Maximum error: %e' without a threshold (thomas-cuda/utils.hpp:27)"
+    },
+    "triad": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "triad.cpp:221-223 prints PASS or FAIL per block size (twin-halves check; 'Error; hostMem' precedes FAIL)"
+    },
+    "unfold": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:157 prints PASS or FAIL"
+    },
+    "winograd": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:180 prints PASS or FAIL (compareResults, utils.cpp:149 percent diff threshold)"
+    },
+    "wyllie": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "PASS"},
+        {"check": "not_contains", "text": "FAIL"}
+      ],
+      "note": "main.cpp:106 prints PASS or FAIL (host vs device ranks)"
+    },
+    "zerocopy": {
+      "checks": [
+        {"check": "exit_code", "expect": 0},
+        {"check": "contains", "text": "SUCCESS"},
+        {"check": "not_contains", "text": "FAILURE"}
+      ],
+      "note": "main.cpp:142 prints SUCCESS or FAILURE (relative L2 error < 1e-6)"
+    }
+  }
+}
