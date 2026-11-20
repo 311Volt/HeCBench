@@ -1,6 +1,7 @@
 # Pass rules for llvm-project/.github/workflows/hecbench/hecbench_p1.py.
 #
-# Every benchmark must exit with code 0. A rule may add checks on its output:
+# Every benchmark must exit with code 0, unless its rule says otherwise with
+# exit. A rule may add checks on its output:
 #
 #   name: no_check          nothing beyond the exit code can be checked; the
 #                           program prints no verdict (usually timings only)
@@ -11,6 +12,9 @@
 #       not_contains: [...] no output line has it (a string or a list)
 #       number:             the number printed after the text is in bounds
 #         {after: "text", min: 0.0, max: 1.0e-5}   (write floats as 1.0e-5)
+#     exit: Aborted         optional: how the program must end instead: an exit
+#                           code, or a signal as make reports it (Aborted for
+#                           SIGABRT)
 #
 # Texts are case-sensitive substrings of the output (stdout and stderr merged).
 # Take them from what the benchmark itself prints, and make sure they cannot
@@ -37,11 +41,15 @@ allreduce:
 amgmk:
   checks:
     not_contains: ["Matvec: error:", "Relax: error:", "Axpy: error:"]
-# triggers device asserts on purpose, so their output is expected
+# triggers device asserts on purpose (main.cpp:32), and DPC++ aborts the
+# program on a failed device assert (sycl/doc/design/Assert.md), so it never
+# gets to print "Test assert completed": expect the abort and those asserts,
+# but none from the performance kernels and no SYCL exception
 assert:
+  exit: Aborted
   checks:
-    contains: "Test assert completed, returned OK"
-    not_contains: "returned ERROR!"
+    contains: "Assertion `gid < N` failed"
+    not_contains: ["Assertion `gid <= ", "Assertion `s <= gid` failed", "what():"]
 b+tree: no_check  # result dumps are under #ifdef DEBUG
 babelstream: pass_or_fail
 backprop: pass_or_fail
