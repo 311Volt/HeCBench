@@ -52,9 +52,19 @@ for GPUs. ACM Transactions on Parallel Computing, Vol. 5, No. 2, Article 8
 
 static const int ThreadsPerBlock = 256;
 
-typedef unsigned char stattype;
+// 32 bits instead of the CUDA version's 8: findmins accesses the status
+// atomically, and sycl::atomic_ref has no 8-bit type. The values fit in 8 bits.
+typedef unsigned int stattype;
 static const stattype in = 0xfe;
 static const stattype out = 0;
+
+// findmins spins until work-items of other work-groups have updated the status
+// of neighbouring nodes. The CUDA version relies on volatile for that, but in
+// SYCL the stores of other work-groups are only guaranteed to become visible
+// through atomics; with volatile the kernel never finishes.
+using stat_ref = sycl::atomic_ref<stattype, sycl::memory_order::relaxed,
+                                  sycl::memory_scope::device,
+                                  sycl::access::address_space::global_space>;
 
 /* main computation kernel */
 
@@ -62,7 +72,7 @@ void findmins(sycl::nd_item<1> &item,
     const int nodes,
     const int* const __restrict nidx,
     const int* const __restrict nlist,
-    volatile stattype* const __restrict nstat)
+    stattype* const nstat)
 {
   const int from = item.get_global_id(0);
   const int incr = item.get_group_range(0) * item.get_local_range(0);
@@ -71,19 +81,19 @@ void findmins(sycl::nd_item<1> &item,
   do {
     missing = 0;
     for (int v = from; v < nodes; v += incr) {
-      const stattype nv = nstat[v];
+      const stattype nv = stat_ref(nstat[v]).load();
       if (nv & 1) {
         int i = nidx[v];
-        while ((i < nidx[v + 1]) && ((nv > nstat[nlist[i]]) || ((nv == nstat[nlist[i]]) && (v > nlist[i])))) {
+        while ((i < nidx[v + 1]) && ((nv > stat_ref(nstat[nlist[i]]).load()) || ((nv == stat_ref(nstat[nlist[i]]).load()) && (v > nlist[i])))) {
           i++;
         }
         if (i < nidx[v + 1]) {
           missing = 1;
         } else {
           for (int i = nidx[v]; i < nidx[v + 1]; i++) {
-            nstat[nlist[i]] = out;
+            stat_ref(nstat[nlist[i]]).store(out);
           }
-          nstat[v] = in;
+          stat_ref(nstat[v]).store(in);
         }
       }
     }
