@@ -114,11 +114,12 @@ int main(int argc, char* argv[]) {
 
   q.memcpy(lb, d_lb, sizeof(float)*(N-M+1)).wait();
 
-  // verify
+  // verify; the bounds reach about 1e17, so the tolerance grows with them:
+  // the device and the host round their float sums differently
   reference(subject, avgs, stds, lb_h, lower, upper, M, N);
   bool ok = true;
   for (int i = 0; i < N-M+1; i++) {
-    if (fabs(lb[i] - lb_h[i]) > 1e-2) {
+    if (fabs(lb[i] - lb_h[i]) > 1e-2 + 1e-5 * fabs(lb_h[i])) {
       printf("%d %f %f\n", i, lb[i], lb_h[i]);
       ok = false;
       break;
