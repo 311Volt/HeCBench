@@ -78,5 +78,7 @@ $(program): $(obj)
 clean:
 	rm -rf $(program) $(obj)
 
+# the run time is linear in the number of iterations inside the kernels: about
+# 60 s for 500 on a B580, where the double-precision kernels dominate
 run: $(program)
-	$(LAUNCHER) ./$(program) 5000
+	$(LAUNCHER) ./$(program) 500
