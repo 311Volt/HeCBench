@@ -75,10 +75,14 @@ multimat_F: $(source)
 multimat_FL: $(source)
 	$(CC) $(CFLAGS) -DFUSED -DLINKED $^ -o $@ $(LDFLAGS)
 
-clean:
-	rm -rf $(program)
+# the input ships compressed in the CUDA directory (README)
+volfrac.dat: ../multimaterial-cuda/volfrac.dat.tgz
+	tar -xzmf $< volfrac.dat
 
-run: $(program)
+clean:
+	rm -rf $(program) volfrac.dat
+
+run: $(program) volfrac.dat
 	$(LAUNCHER) ./multimat_FL 2000 2000
 	$(LAUNCHER) ./multimat_F 2000 2000
 	$(LAUNCHER) ./multimat 2000 2000

@@ -75,8 +75,13 @@ $(program): $(obj)
 %.o: %.cpp kernels.h ../mcpr-cuda/reference.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean:
-	rm -rf $(program) $(obj)
+# the input ships compressed in the CUDA directory; unpack it here so that
+# ../mcpr-cuda is left untouched
+alphas.csv: ../mcpr-cuda/alphas.csv.bz2
+	bzip2 -dc $< > $@.tmp && mv $@.tmp $@
 
-run: $(program)
-	$(LAUNCHER) ./$(program) ../mcpr-cuda/alphas.csv 10
+clean:
+	rm -rf $(program) $(obj) alphas.csv
+
+run: $(program) alphas.csv
+	$(LAUNCHER) ./$(program) alphas.csv 10
